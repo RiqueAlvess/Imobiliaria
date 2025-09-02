@@ -166,29 +166,30 @@
 
                         <!-- Características -->
                         <div class="d-flex flex-wrap gap-2 mb-3">
-                            {% if imovel.area_util %}
-                            <small class="badge bg-light text-dark">
-                                <i class="fas fa-expand-arrows-alt me-1"></i>{{ imovel.area_util|floatformat:0 }}m²
-                            </small>
-                            {% endif %}
-                            {% if imovel.quartos %}
-                            <small class="badge bg-light text-dark">
-                                <i class="fas fa-bed me-1"></i>{{ imovel.quartos }} quarto{{ imovel.quartos|pluralize }}
-                            </small>
-                            {% endif %}
-                            {% if imovel.banheiros %}
-                            <small class="badge bg-light text-dark">
-                                <i class="fas fa-bath me-1"></i>{{ imovel.banheiros }} banheiro{{
-                                imovel.banheiros|pluralize }}
-                            </small>
-                            {% endif %}
-                            {% if imovel.vagas_garagem %}
-                            <small class="badge bg-light text-dark">
-                                <i class="fas fa-car me-1"></i>{{ imovel.vagas_garagem }} vaga{{
-                                imovel.vagas_garagem|pluralize }}
-                            </small>
-                            {% endif %}
-                        </div>
+    {% if imovel.area_util %}
+    <small class="badge bg-light text-dark">
+        <i class="fas fa-expand-arrows-alt me-1"></i>{{ imovel.area_util|floatformat:0 }}m²
+    </small>
+    {% endif %}
+    
+    {% if imovel.quartos %}
+    <small class="badge bg-light text-dark">
+        <i class="fas fa-bed me-1"></i>{{ imovel.quartos }} quarto{{ imovel.quartos|pluralize }}
+    </small>
+    {% endif %}
+    
+    {% if imovel.banheiros %}
+    <small class="badge bg-light text-dark">
+        <i class="fas fa-bath me-1"></i>{{ imovel.banheiros }} banheiro{{ imovel.banheiros|pluralize }}
+    </small>
+    {% endif %}
+    
+    {% if imovel.vagas_garagem %}
+    <small class="badge bg-light text-dark">
+        <i class="fas fa-car me-1"></i>{{ imovel.vagas_garagem }} vaga{{ imovel.vagas_garagem|pluralize }}
+    </small>
+    {% endif %}
+</div>
 
                         <!-- Localização -->
                         <p class="card-text text-muted mb-3">
