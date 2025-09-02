@@ -38,10 +38,14 @@ def lista_imoveis(request):
         'infraestrutura'
     )
     
+    # Função helper para verificar se um valor é válido
+    def is_valid_value(value):
+        return value and value.strip() and value.strip().lower() not in ['none', '']
+    
     # Aplicar filtros
     # Busca por texto
     busca = request.GET.get('busca', '').strip()
-    if busca:
+    if is_valid_value(busca):
         imoveis = imoveis.filter(
             Q(titulo__icontains=busca) |
             Q(endereco__icontains=busca) |
@@ -51,90 +55,102 @@ def lista_imoveis(request):
         )
     
     # Finalidade (venda, aluguel, temporada)
-    finalidade = request.GET.get('finalidade')
-    if finalidade:
+    finalidade = request.GET.get('finalidade', '').strip()
+    if is_valid_value(finalidade):
         imoveis = imoveis.filter(precos__finalidade=finalidade)
     
     # Tipo de imóvel
-    tipo = request.GET.get('tipo')
-    if tipo:
+    tipo = request.GET.get('tipo', '').strip()
+    if is_valid_value(tipo):
         imoveis = imoveis.filter(tipo=tipo)
     
     # Cidade
-    cidade = request.GET.get('cidade')
-    if cidade:
+    cidade = request.GET.get('cidade', '').strip()
+    if is_valid_value(cidade):
         imoveis = imoveis.filter(cidade__iexact=cidade)
     
     # Bairro
-    bairro = request.GET.get('bairro')
-    if bairro:
+    bairro = request.GET.get('bairro', '').strip()
+    if is_valid_value(bairro):
         imoveis = imoveis.filter(bairro__icontains=bairro)
     
     # Quartos mínimos
-    quartos = request.GET.get('quartos')
-    if quartos:
+    quartos = request.GET.get('quartos', '').strip()
+    if is_valid_value(quartos):
         try:
-            imoveis = imoveis.filter(quartos__gte=int(quartos))
+            quartos_int = int(quartos)
+            if quartos_int > 0:
+                imoveis = imoveis.filter(quartos__gte=quartos_int)
         except (ValueError, TypeError):
             pass
     
     # Banheiros mínimos
-    banheiros = request.GET.get('banheiros')
-    if banheiros:
+    banheiros = request.GET.get('banheiros', '').strip()
+    if is_valid_value(banheiros):
         try:
-            imoveis = imoveis.filter(banheiros__gte=int(banheiros))
+            banheiros_int = int(banheiros)
+            if banheiros_int > 0:
+                imoveis = imoveis.filter(banheiros__gte=banheiros_int)
         except (ValueError, TypeError):
             pass
     
     # Vagas de garagem mínimas
-    vagas = request.GET.get('vagas')
-    if vagas:
+    vagas = request.GET.get('vagas', '').strip()
+    if is_valid_value(vagas):
         try:
-            imoveis = imoveis.filter(vagas_garagem__gte=int(vagas))
+            vagas_int = int(vagas)
+            if vagas_int > 0:
+                imoveis = imoveis.filter(vagas_garagem__gte=vagas_int)
         except (ValueError, TypeError):
             pass
     
     # Área mínima
-    area_min = request.GET.get('area_min')
-    if area_min:
+    area_min = request.GET.get('area_min', '').strip()
+    if is_valid_value(area_min):
         try:
-            imoveis = imoveis.filter(area_util__gte=float(area_min))
+            area_min_float = float(area_min)
+            if area_min_float > 0:
+                imoveis = imoveis.filter(area_util__gte=area_min_float)
         except (ValueError, TypeError):
             pass
     
     # Preço mínimo e máximo
-    preco_min = request.GET.get('preco_min')
-    preco_max = request.GET.get('preco_max')
+    preco_min = request.GET.get('preco_min', '').strip()
+    preco_max = request.GET.get('preco_max', '').strip()
     
-    if preco_min:
+    if is_valid_value(preco_min):
         try:
-            imoveis = imoveis.filter(precos__valor__gte=float(preco_min))
+            preco_min_float = float(preco_min)
+            if preco_min_float > 0:
+                imoveis = imoveis.filter(precos__valor__gte=preco_min_float)
         except (ValueError, TypeError):
             pass
     
-    if preco_max:
+    if is_valid_value(preco_max):
         try:
-            imoveis = imoveis.filter(precos__valor__lte=float(preco_max))
+            preco_max_float = float(preco_max)
+            if preco_max_float > 0:
+                imoveis = imoveis.filter(precos__valor__lte=preco_max_float)
         except (ValueError, TypeError):
             pass
     
     # Mobília
-    mobilia = request.GET.get('mobilia')
-    if mobilia:
+    mobilia = request.GET.get('mobilia', '').strip()
+    if is_valid_value(mobilia):
         imoveis = imoveis.filter(mobilia=mobilia)
     
     # Pet friendly
-    pet_friendly = request.GET.get('pet_friendly')
+    pet_friendly = request.GET.get('pet_friendly', '').strip()
     if pet_friendly == 'true':
         imoveis = imoveis.filter(pet_friendly=True)
     
     # Aceita financiamento
-    financiamento = request.GET.get('financiamento')
+    financiamento = request.GET.get('financiamento', '').strip()
     if financiamento == 'true':
         imoveis = imoveis.filter(aceita_financiamento=True)
     
     # Somente com fotos
-    com_fotos = request.GET.get('com_fotos')
+    com_fotos = request.GET.get('com_fotos', '').strip()
     if com_fotos == 'true':
         imoveis = imoveis.filter(fotos__isnull=False)
     
@@ -143,12 +159,13 @@ def lista_imoveis(request):
     if infraestrutura_ids:
         for infra_id in infraestrutura_ids:
             try:
-                imoveis = imoveis.filter(infraestrutura=int(infra_id))
+                infra_id_int = int(infra_id)
+                imoveis = imoveis.filter(infraestrutura=infra_id_int)
             except (ValueError, TypeError):
                 pass
     
     # Ordenação
-    ordenacao = request.GET.get('ordenacao', 'relevancia')
+    ordenacao = request.GET.get('ordenacao', '').strip()
     if ordenacao == 'preco_menor':
         imoveis = imoveis.order_by('precos__valor')
     elif ordenacao == 'preco_maior':
@@ -159,7 +176,7 @@ def lista_imoveis(request):
         imoveis = imoveis.order_by('-area_util')
     else:  # relevancia (padrão)
         imoveis = imoveis.order_by('-criado_em', '-atualizado_em')
-        ordenacao = 'relevancia'  # Garantir que seja sempre 'relevancia' se não especificado
+        ordenacao = 'relevancia'
     
     # Remover duplicatas (devido aos joins com preços)
     imoveis = imoveis.distinct()
@@ -180,6 +197,16 @@ def lista_imoveis(request):
     finalidades = PrecoPorFinalidade.Finalidade.choices
     mobilias = Imovel.Mobilia.choices
     
+    # Filtros aplicados - limpar valores None/vazios para o template
+    filtros_aplicados = {}
+    for key, value in request.GET.items():
+        if key != 'page' and is_valid_value(value):
+            filtros_aplicados[key] = value
+    
+    # Adicionar listas múltiplas
+    if infraestrutura_ids:
+        filtros_aplicados['infraestrutura'] = infraestrutura_ids
+    
     context = {
         'page_obj': page_obj,
         'total_imoveis': paginator.count,
@@ -188,25 +215,7 @@ def lista_imoveis(request):
         'tipos': tipos,
         'finalidades': finalidades,
         'mobilias': mobilias,
-        'filtros_aplicados': {
-            'busca': busca,
-            'finalidade': finalidade,
-            'tipo': tipo,
-            'cidade': cidade,
-            'bairro': bairro,
-            'quartos': quartos,
-            'banheiros': banheiros,
-            'vagas': vagas,
-            'area_min': area_min,
-            'preco_min': preco_min,
-            'preco_max': preco_max,
-            'mobilia': mobilia,
-            'pet_friendly': pet_friendly,
-            'financiamento': financiamento,
-            'com_fotos': com_fotos,
-            'infraestrutura': infraestrutura_ids,
-            'ordenacao': ordenacao,
-        }
+        'filtros_aplicados': filtros_aplicados,
     }
     
     return render(request, 'core/lista_imoveis.html', context)

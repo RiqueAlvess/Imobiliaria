@@ -8,6 +8,32 @@
     {% endif %}
 {% endblock %}
 
+{% block extra_css %}
+<style>
+    .filtros-sidebar {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        position: -webkit-sticky;
+        position: sticky;
+        top: 80px; /* Espaço para não sobrepor o header */
+        z-index: 10;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+    
+    @media (max-width: 991.98px) {
+        .filtros-sidebar {
+            position: static;
+        }
+    }
+    
+    .navbar {
+        z-index: 1030; /* Bootstrap navbar padrão */
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Header da Página -->
 <section class="bg-light py-4">
@@ -102,7 +128,7 @@
     <div class="row">
         <!-- Sidebar de Filtros (Desktop) -->
         <div class="col-lg-3 d-none d-lg-block">
-            <div class="filtros-sidebar sticky-top">
+            <div class="filtros-sidebar">
                 <h5 class="fw-bold mb-3">
                     <i class="fas fa-filter me-2"></i>Filtros
                 </h5>
@@ -112,7 +138,7 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Buscar</label>
                         <input type="text" class="form-control" name="busca" 
-                               value="{{ filtros_aplicados.busca }}" 
+                               value="{{ filtros_aplicados.busca|default_if_none:'' }}" 
                                placeholder="Bairro, cidade, endereço...">
                     </div>
                     
@@ -153,7 +179,7 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Bairro</label>
                         <input type="text" class="form-control" name="bairro" 
-                               value="{{ filtros_aplicados.bairro }}" 
+                               value="{{ filtros_aplicados.bairro|default_if_none:'' }}" 
                                placeholder="Digite o bairro">
                     </div>
                     
@@ -163,12 +189,12 @@
                         <div class="row g-2">
                             <div class="col-6">
                                 <input type="number" class="form-control" name="preco_min" 
-                                       value="{{ filtros_aplicados.preco_min }}" 
+                                       value="{{ filtros_aplicados.preco_min|default_if_none:'' }}" 
                                        placeholder="Mínimo" min="0">
                             </div>
                             <div class="col-6">
                                 <input type="number" class="form-control" name="preco_max" 
-                                       value="{{ filtros_aplicados.preco_max }}" 
+                                       value="{{ filtros_aplicados.preco_max|default_if_none:'' }}" 
                                        placeholder="Máximo" min="0">
                             </div>
                         </div>
@@ -212,7 +238,7 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Área mín. (m²)</label>
                         <input type="number" class="form-control" name="area_min" 
-                               value="{{ filtros_aplicados.area_min }}" 
+                               value="{{ filtros_aplicados.area_min|default_if_none:'' }}" 
                                placeholder="Ex: 50" min="0">
                     </div>
                     
@@ -265,7 +291,7 @@
                             <div class="row g-3">
                                 <div class="col-12">
                                     <input type="text" class="form-control" name="busca" 
-                                           value="{{ filtros_aplicados.busca }}" 
+                                           value="{{ filtros_aplicados.busca|default_if_none:'' }}" 
                                            placeholder="Buscar por bairro, cidade...">
                                 </div>
                                 <div class="col-6">
@@ -286,12 +312,12 @@
                                 </div>
                                 <div class="col-6">
                                     <input type="number" class="form-control" name="preco_min" 
-                                           value="{{ filtros_aplicados.preco_min }}" 
+                                           value="{{ filtros_aplicados.preco_min|default_if_none:'' }}" 
                                            placeholder="Preço mín.">
                                 </div>
                                 <div class="col-6">
                                     <input type="number" class="form-control" name="preco_max" 
-                                           value="{{ filtros_aplicados.preco_max }}" 
+                                           value="{{ filtros_aplicados.preco_max|default_if_none:'' }}" 
                                            placeholder="Preço máx.">
                                 </div>
                                 <div class="col-12">

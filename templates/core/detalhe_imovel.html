@@ -18,6 +18,29 @@
     em {{ imovel.cidade }}.
 {% endblock %}
 
+{% block extra_css %}
+<style>
+    .sticky-sidebar {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 80px; /* Espaço para não sobrepor o header */
+        z-index: 10;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+    
+    @media (max-width: 991.98px) {
+        .sticky-sidebar {
+            position: static;
+        }
+    }
+    
+    .navbar {
+        z-index: 1030; /* Bootstrap navbar padrão */
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Breadcrumb -->
 <nav class="bg-light py-2">
@@ -283,106 +306,108 @@
         <!-- Sidebar -->
         <div class="col-lg-4">
             <!-- Card de Contato -->
-            <div class="card mb-4 sticky-top">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="fas fa-phone me-2"></i>Interessado?
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text mb-3">Entre em contato conosco para mais informações ou agendar uma visita.</p>
-                    
-                    <!-- Preço resumo -->
-                    {% for preco in imovel.precos.all %}
-                    <div class="text-center mb-3">
-                        <div class="h4 text-success fw-bold">
-                            {% if preco.finalidade == 'temporada' %}
-                                R$ {{ preco.valor|floatformat:0 }}/dia
-                            {% else %}
-                                R$ {{ preco.valor|floatformat:0 }}
-                            {% endif %}
+            <div class="sticky-sidebar">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-phone me-2"></i>Interessado?
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text mb-3">Entre em contato conosco para mais informações ou agendar uma visita.</p>
+                        
+                        <!-- Preço resumo -->
+                        {% for preco in imovel.precos.all %}
+                        <div class="text-center mb-3">
+                            <div class="h4 text-success fw-bold">
+                                {% if preco.finalidade == 'temporada' %}
+                                    R$ {{ preco.valor|floatformat:0 }}/dia
+                                {% else %}
+                                    R$ {{ preco.valor|floatformat:0 }}
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">{{ preco.get_finalidade_display }}</small>
                         </div>
-                        <small class="text-muted">{{ preco.get_finalidade_display }}</small>
-                    </div>
-                    {% if not forloop.last %}<hr>{% endif %}
-                    {% empty %}
-                    <div class="text-center mb-3">
-                        <div class="h4 text-muted">Consulte valores</div>
-                    </div>
-                    {% endfor %}
-                    
-                    <div class="d-grid gap-2">
-                        <a href="https://wa.me/5511999999999?text={{ whatsapp_msg|urlencode }}" 
-                           class="btn btn-whatsapp btn-lg" target="_blank">
-                            <i class="fab fa-whatsapp me-2"></i>WhatsApp
-                        </a>
-                        <a href="tel:+5511999999999" class="btn btn-outline-primary">
-                            <i class="fas fa-phone me-2"></i>(11) 99999-9999
-                        </a>
-                        <a href="mailto:contato@imobiliaria.com.br?subject=Interesse no imóvel: {{ imovel.titulo }}" 
-                           class="btn btn-outline-secondary">
-                            <i class="fas fa-envelope me-2"></i>E-mail
-                        </a>
-                    </div>
-                    
-                    <hr>
-                    
-                    <!-- Compartilhar -->
-                    <div class="text-center">
-                        <small class="text-muted d-block mb-2">Compartilhar:</small>
-                        <div class="d-flex justify-content-center gap-2">
-                            <a href="https://wa.me/?text=Confira este imóvel: {{ request.build_absolute_uri }}" 
-                               class="btn btn-sm btn-outline-success" target="_blank">
-                                <i class="fab fa-whatsapp"></i>
+                        {% if not forloop.last %}<hr>{% endif %}
+                        {% empty %}
+                        <div class="text-center mb-3">
+                            <div class="h4 text-muted">Consulte valores</div>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="d-grid gap-2">
+                            <a href="https://wa.me/5511999999999?text={{ whatsapp_msg|urlencode }}" 
+                               class="btn btn-whatsapp btn-lg" target="_blank">
+                                <i class="fab fa-whatsapp me-2"></i>WhatsApp
                             </a>
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
-                               class="btn btn-sm btn-outline-primary" target="_blank">
-                                <i class="fab fa-facebook"></i>
+                            <a href="tel:+5511999999999" class="btn btn-outline-primary">
+                                <i class="fas fa-phone me-2"></i>(11) 99999-9999
                             </a>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="navigator.clipboard.writeText('{{ request.build_absolute_uri }}')">
-                                <i class="fas fa-link"></i>
-                            </button>
+                            <a href="mailto:contato@imobiliaria.com.br?subject=Interesse no imóvel: {{ imovel.titulo }}" 
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-envelope me-2"></i>E-mail
+                            </a>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- Compartilhar -->
+                        <div class="text-center">
+                            <small class="text-muted d-block mb-2">Compartilhar:</small>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="https://wa.me/?text=Confira este imóvel: {{ request.build_absolute_uri }}" 
+                                   class="btn btn-sm btn-outline-success" target="_blank">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
+                                   class="btn btn-sm btn-outline-primary" target="_blank">
+                                    <i class="fab fa-facebook"></i>
+                                </a>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="copiarLink()">
+                                    <i class="fas fa-link"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Dados do Proprietário -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h6 class="card-title">Proprietário</h6>
-                    <p class="card-text">
-                        <i class="fas fa-user me-2"></i>{{ imovel.proprietario.nome_completo }}
-                    </p>
-                    {% if imovel.proprietario.telefone %}
-                    <p class="card-text">
-                        <i class="fas fa-phone me-2"></i>{{ imovel.proprietario.telefone }}
-                    </p>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <!-- Localização -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0">Localização</h6>
-                </div>
-                <div class="card-body">
-                    <address class="mb-0">
-                        <strong>{{ imovel.endereco }}</strong><br>
-                        {{ imovel.bairro }}<br>
-                        {{ imovel.cidade }} - {{ imovel.estado }}<br>
-                        CEP: {{ imovel.cep }}
-                    </address>
-                    
-                    {% if imovel.latitude and imovel.longitude %}
-                    <div class="mt-3">
-                        <a href="https://maps.google.com/?q={{ imovel.latitude }},{{ imovel.longitude }}" 
-                           target="_blank" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-map-marked-alt me-1"></i>Ver no Mapa
-                        </a>
+                
+                <!-- Dados do Proprietário -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h6 class="card-title">Proprietário</h6>
+                        <p class="card-text">
+                            <i class="fas fa-user me-2"></i>{{ imovel.proprietario.nome_completo }}
+                        </p>
+                        {% if imovel.proprietario.telefone %}
+                        <p class="card-text">
+                            <i class="fas fa-phone me-2"></i>{{ imovel.proprietario.telefone }}
+                        </p>
+                        {% endif %}
                     </div>
-                    {% endif %}
+                </div>
+                
+                <!-- Localização -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">Localização</h6>
+                    </div>
+                    <div class="card-body">
+                        <address class="mb-0">
+                            <strong>{{ imovel.endereco }}</strong><br>
+                            {{ imovel.bairro }}<br>
+                            {{ imovel.cidade }} - {{ imovel.estado }}<br>
+                            CEP: {{ imovel.cep }}
+                        </address>
+                        
+                        {% if imovel.latitude and imovel.longitude %}
+                        <div class="mt-3">
+                            <a href="https://maps.google.com/?q={{ imovel.latitude }},{{ imovel.longitude }}" 
+                               target="_blank" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-map-marked-alt me-1"></i>Ver no Mapa
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -448,7 +473,18 @@
     // Copiar link para clipboard
     function copiarLink() {
         navigator.clipboard.writeText(window.location.href).then(function() {
-            alert('Link copiado para a área de transferência!');
+            // Toast simples sem dependências
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed top-0 start-50 translate-middle-x alert alert-success mt-3';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = '<i class="fas fa-check me-2"></i>Link copiado para a área de transferência!';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }).catch(function() {
+            alert('Erro ao copiar o link. Tente novamente.');
         });
     }
 </script>
