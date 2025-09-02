@@ -1,0 +1,496 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if total_imoveis %}
+{{ total_imoveis }} Imóveis Encontrados - Imobiliária
+{% else %}
+Buscar Imóveis - Imobiliária
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- Header da Página -->
+<section class="bg-light py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-search me-2"></i>Imóveis Disponíveis
+                </h1>
+                <p class="text-muted mb-0">{{ total_imoveis }} imóvel{{ total_imoveis|pluralize:" encontrado,is
+                    encontrados" }}</p>
+            </div>
+            <div class="col-md-6">
+                <!-- Busca rápida mobile -->
+                <div class="d-md-none mt-3">
+                    <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#filtrosMobile">
+                        <i class="fas fa-filter me-2"></i>Filtros
+                    </button>
+                </div>
+
+                <!-- Ordenação -->
+                <form method="get" class="d-none d-md-block">
+                    {% for key, value in filtros_aplicados.items %}
+                    {% if key != 'ordenacao' and value %}
+                    {% if key == 'infraestrutura' %}
+                    {% for infra_id in value %}
+                    <input type="hidden" name="infraestrutura" value="{{ infra_id }}">
+                    {% endfor %}
+                    {% else %}
+                    <input type="hidden" name="{{ key }}" value="{{ value }}">
+                    {% endif %}
+                    {% endif %}
+                    {% endfor %}
+
+                    <div class="input-group">
+                        <label class="input-group-text">Ordenar por:</label>
+                        <select name="ordenacao" class="form-select" onchange="this.form.submit()">
+                            <option value="relevancia" {% if filtros_aplicados.ordenacao=="relevancia" %} selected{%
+                                endif %}>
+                                Mais Relevantes
+                            </option>
+                            <option value="mais_recentes" {% if filtros_aplicados.ordenacao=="mais_recentes" %}
+                                selected{% endif %}>
+                                Mais Recentes
+                            </option>
+                            <option value="preco_menor" {% if filtros_aplicados.ordenacao=="preco_menor" %} selected{%
+                                endif %}>
+                                Menor Preço
+                            </option>
+                            <option value="preco_maior" {% if filtros_aplicados.ordenacao=="preco_maior" %} selected{%
+                                endif %}>
+                                Maior Preço
+                            </option>
+                            <option value="maior_area" {% if filtros_aplicados.ordenacao=="maior_area" %} selected{%
+                                endif %}>
+                                Maior Área
+                            </option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Chips de filtros aplicados -->
+        <div class="mt-3">
+            {% if filtros_aplicados.busca or filtros_aplicados.finalidade or filtros_aplicados.tipo or
+            filtros_aplicados.cidade %}
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                <small class="text-muted me-2">Filtros aplicados:</small>
+
+                {% if filtros_aplicados.busca %}
+                <span class="chip-filtro">
+                    Busca: "{{ filtros_aplicados.busca }}"
+                    <a href="?{% for key, value in filtros_aplicados.items %}{% if key != 'busca' and value %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}"
+                        class="text-white ms-1">×</a>
+                </span>
+                {% endif %}
+
+                {% if filtros_aplicados.finalidade %}
+                <span class="chip-filtro">
+                    {{ filtros_aplicados.finalidade|capfirst }}
+                    <a href="?{% for key, value in filtros_aplicados.items %}{% if key != 'finalidade' and value %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}"
+                        class="text-white ms-1">×</a>
+                </span>
+                {% endif %}
+
+                {% if filtros_aplicados.tipo %}
+                <span class="chip-filtro">
+                    {{ filtros_aplicados.tipo|capfirst }}
+                    <a href="?{% for key, value in filtros_aplicados.items %}{% if key != 'tipo' and value %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}"
+                        class="text-white ms-1">×</a>
+                </span>
+                {% endif %}
+
+                {% if filtros_aplicados.cidade %}
+                <span class="chip-filtro">
+                    {{ filtros_aplicados.cidade }}
+                    <a href="?{% for key, value in filtros_aplicados.items %}{% if key != 'cidade' and value %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}"
+                        class="text-white ms-1">×</a>
+                </span>
+                {% endif %}
+
+                <a href="{% url 'core:lista_imoveis' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-times me-1"></i>Limpar tudo
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<div class="container my-4">
+    <div class="row">
+        <!-- Sidebar de Filtros (Desktop) -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="filtros-sidebar sticky-top">
+                <h5 class="fw-bold mb-3">
+                    <i class="fas fa-filter me-2"></i>Filtros
+                </h5>
+
+                <form method="get">
+                    <!-- Busca -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Buscar</label>
+                        <input type="text" class="form-control" name="busca" value="{{ filtros_aplicados.busca }}"
+                            placeholder="Bairro, cidade, endereço...">
+                    </div>
+
+                    <!-- Finalidade -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Finalidade</label>
+                        <select class="form-select" name="finalidade">
+                            <option value="">Todas</option>
+                            {% for codigo, nome in finalidades %}
+                            <option value="{{ codigo }}" {% if filtros_aplicados.finalidade==codigo %} selected{% endif
+                                %}>
+                                {{ nome }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Tipo -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tipo</label>
+                        <select class="form-select" name="tipo">
+                            <option value="">Todos</option>
+                            {% for codigo, nome in tipos %}
+                            <option value="{{ codigo }}" {% if filtros_aplicados.tipo==codigo %} selected{% endif %}>
+                                {{ nome }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Cidade -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Cidade</label>
+                        <select class="form-select" name="cidade">
+                            <option value="">Todas</option>
+                            {% for cidade in cidades %}
+                            <option value="{{ cidade }}" {% if filtros_aplicados.cidade==cidade %} selected{% endif %}>
+                                {{ cidade }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Bairro -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Bairro</label>
+                        <input type="text" class="form-control" name="bairro" value="{{ filtros_aplicados.bairro }}"
+                            placeholder="Digite o bairro">
+                    </div>
+
+                    <!-- Preço -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Preço (R$)</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="number" class="form-control" name="preco_min"
+                                    value="{{ filtros_aplicados.preco_min }}" placeholder="Mínimo" min="0">
+                            </div>
+                            <div class="col-6">
+                                <input type="number" class="form-control" name="preco_max"
+                                    value="{{ filtros_aplicados.preco_max }}" placeholder="Máximo" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quartos -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Quartos (mín)</label>
+                        <select class="form-select" name="quartos">
+                            <option value="">Qualquer</option>
+                            <option value="1" {% if filtros_aplicados.quartos=="1" %} selected{% endif %}>1+</option>
+                            <option value="2" {% if filtros_aplicados.quartos=="2" %} selected{% endif %}>2+</option>
+                            <option value="3" {% if filtros_aplicados.quartos=="3" %} selected{% endif %}>3+</option>
+                            <option value="4" {% if filtros_aplicados.quartos=="4" %} selected{% endif %}>4+</option>
+                        </select>
+                    </div>
+
+                    <!-- Banheiros -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Banheiros (mín)</label>
+                        <select class="form-select" name="banheiros">
+                            <option value="">Qualquer</option>
+                            <option value="1" {% if filtros_aplicados.banheiros=="1" %} selected{% endif %}>1+</option>
+                            <option value="2" {% if filtros_aplicados.banheiros=="2" %} selected{% endif %}>2+</option>
+                            <option value="3" {% if filtros_aplicados.banheiros=="3" %} selected{% endif %}>3+</option>
+                        </select>
+                    </div>
+
+                    <!-- Vagas -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Vagas (mín)</label>
+                        <select class="form-select" name="vagas">
+                            <option value="">Qualquer</option>
+                            <option value="1" {% if filtros_aplicados.vagas=="1" %} selected{% endif %}>1+</option>
+                            <option value="2" {% if filtros_aplicados.vagas=="2" %} selected{% endif %}>2+</option>
+                            <option value="3" {% if filtros_aplicados.vagas=="3" %} selected{% endif %}>3+</option>
+                        </select>
+                    </div>
+
+                    <!-- Área mínima -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Área mín. (m²)</label>
+                        <input type="number" class="form-control" name="area_min"
+                            value="{{ filtros_aplicados.area_min }}" placeholder="Ex: 50" min="0">
+                    </div>
+
+                    <!-- Mobília -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mobília</label>
+                        <select class="form-select" name="mobilia">
+                            <option value="">Qualquer</option>
+                            {% for codigo, nome in mobilias %}
+                            <option value="{{ codigo }}" {% if filtros_aplicados.mobilia==codigo %} selected{% endif %}>
+                                {{ nome }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Checkboxes -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="pet_friendly" value="true" {% if
+                                filtros_aplicados.pet_friendly=="true" %} checked{% endif %}>
+                            <label class="form-check-label">Pet Friendly</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="financiamento" value="true" {% if
+                                filtros_aplicados.financiamento=="true" %} checked{% endif %}>
+                            <label class="form-check-label">Aceita Financiamento</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="com_fotos" value="true" {% if
+                                filtros_aplicados.com_fotos=="true" %} checked{% endif %}>
+                            <label class="form-check-label">Somente com Fotos</label>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Filtrar
+                        </button>
+                        <a href="{% url 'core:lista_imoveis' %}" class="btn btn-outline-secondary mt-2">
+                            <i class="fas fa-times me-2"></i>Limpar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Filtros Mobile (Collapse) -->
+        <div class="col-12 d-lg-none">
+            <div class="collapse mb-4" id="filtrosMobile">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Mesmo formulário dos filtros, mas adaptado para mobile -->
+                        <form method="get">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <input type="text" class="form-control" name="busca"
+                                        value="{{ filtros_aplicados.busca }}"
+                                        placeholder="Buscar por bairro, cidade...">
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-select" name="finalidade">
+                                        <option value="">Finalidade</option>
+                                        {% for codigo, nome in finalidades %}
+                                        <option value="{{ codigo }}" {% if filtros_aplicados.finalidade==codigo %}
+                                            selected{% endif %}>
+                                            {{ nome }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <select class="form-select" name="tipo">
+                                        <option value="">Tipo</option>
+                                        {% for codigo, nome in tipos %}
+                                        <option value="{{ codigo }}" {% if filtros_aplicados.tipo==codigo %} selected{%
+                                            endif %}>
+                                            {{ nome }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" class="form-control" name="preco_min"
+                                        value="{{ filtros_aplicados.preco_min }}" placeholder="Preço mín.">
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" class="form-control" name="preco_max"
+                                        value="{{ filtros_aplicados.preco_max }}" placeholder="Preço máx.">
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-search me-2"></i>Aplicar Filtros
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Imóveis -->
+        <div class="col-lg-9">
+            {% if page_obj %}
+            <div class="row g-4">
+                {% for imovel in page_obj %}
+                <div class="col-md-6 col-xl-4">
+                    <div class="card card-imovel h-100">
+                        <div class="position-relative">
+                            {% if imovel.foto_capa %}
+                            <img src="{{ imovel.foto_capa.imagem.url }}" class="card-img-top foto-capa"
+                                alt="{{ imovel.titulo }}">
+                            {% else %}
+                            <div class="foto-capa bg-light d-flex align-items-center justify-content-center">
+                                <i class="fas fa-image fs-1 text-muted"></i>
+                            </div>
+                            {% endif %}
+
+                            <!-- Badges -->
+                            {% for preco in imovel.precos.all %}
+                            {% if forloop.first %}
+                            {% if preco.finalidade == 'venda' %}
+                            <span class="badge bg-success badge-finalidade">Venda</span>
+                            {% elif preco.finalidade == 'aluguel' %}
+                            <span class="badge bg-primary badge-finalidade">Aluguel</span>
+                            {% elif preco.finalidade == 'temporada' %}
+                            <span class="badge bg-warning badge-finalidade">Temporada</span>
+                            {% endif %}
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <div class="card-body">
+                            <h6 class="card-title">{{ imovel.titulo|truncatechars:40 }}</h6>
+
+                            <!-- Preços -->
+                            {% for preco in imovel.precos.all %}
+                            <div class="preco-destaque mb-2">
+                                {% if preco.finalidade == 'temporada' %}
+                                R$ {{ preco.valor|floatformat:0 }}/dia
+                                {% else %}
+                                R$ {{ preco.valor|floatformat:0 }}
+                                {% endif %}
+                            </div>
+                            {% if forloop.first %}{% break %}{% endif %}
+                            {% empty %}
+                            <div class="text-muted mb-2">Consulte valores</div>
+                            {% endfor %}
+
+                            <!-- Características -->
+                            <div class="d-flex flex-wrap gap-1 mb-2">
+                                {% if imovel.area_util %}
+                                <small class="badge bg-light text-dark">{{ imovel.area_util|floatformat:0 }}m²</small>
+                                {% endif %}
+                                {% if imovel.quartos %}
+                                <small class="badge bg-light text-dark">{{ imovel.quartos }}q</small>
+                                {% endif %}
+                                {% if imovel.banheiros %}
+                                <small class="badge bg-light text-dark">{{ imovel.banheiros }}b</small>
+                                {% endif %}
+                                {% if imovel.vagas_garagem %}
+                                <small class="badge bg-light text-dark">{{ imovel.vagas_garagem }}v</small>
+                                {% endif %}
+                            </div>
+
+                            <!-- Localização -->
+                            <p class="card-text text-muted small mb-2">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                {{ imovel.bairro }}, {{ imovel.cidade }}
+                            </p>
+
+                            <!-- Badges extras -->
+                            <div class="d-flex flex-wrap gap-1 mb-3">
+                                {% if imovel.pet_friendly %}
+                                <small class="badge bg-info">Pet OK</small>
+                                {% endif %}
+                                {% if imovel.mobilia != 'vazio' %}
+                                <small class="badge bg-secondary">{{ imovel.get_mobilia_display }}</small>
+                                {% endif %}
+                            </div>
+
+                            <!-- Botões -->
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'core:detalhe_imovel' imovel.pk %}"
+                                    class="btn btn-outline-primary btn-sm">
+                                    Ver Detalhes
+                                </a>
+                                <a href="https://wa.me/5511999999999?text=Interesse no imóvel: {{ imovel.titulo|urlencode }}"
+                                    class="btn btn-whatsapp btn-sm" target="_blank">
+                                    <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginação -->
+            {% if page_obj.has_other_pages %}
+            <nav class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="?page=1{% for key, value in filtros_aplicados.items %}{% if value %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="?page={{ page_obj.previous_page_number }}{% for key, value in filtros_aplicados.items %}{% if value %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="?page={{ page_obj.next_page_number }}{% for key, value in filtros_aplicados.items %}{% if value %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="?page={{ page_obj.paginator.num_pages }}{% for key, value in filtros_aplicados.items %}{% if value %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <!-- Estado vazio -->
+            <div class="text-center py-5">
+                <i class="fas fa-search fs-1 text-muted mb-3"></i>
+                <h4 class="text-muted">Nenhum imóvel encontrado</h4>
+                <p class="text-muted">Tente ajustar os filtros ou fazer uma nova busca.</p>
+                <a href="{% url 'core:lista_imoveis' %}" class="btn btn-primary">
+                    <i class="fas fa-refresh me-2"></i>Ver Todos os Imóveis
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
