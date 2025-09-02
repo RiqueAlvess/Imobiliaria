@@ -3,19 +3,19 @@
 {% block title %}{{ imovel.titulo }} - {{ imovel.bairro }}, {{ imovel.cidade }} - Imobiliária{% endblock %}
 
 {% block description %}
-{{ imovel.get_tipo_display }} em {{ imovel.bairro }}, {{ imovel.cidade }}.
-{% if imovel.area_util %}{{ imovel.area_util|floatformat:0 }}m²,{% endif %}
-{% if imovel.quartos %}{{ imovel.quartos }} quartos,{% endif %}
-{% if imovel.banheiros %}{{ imovel.banheiros }} banheiros.{% endif %}
-{{ imovel.descricao|truncatewords:20 }}
+    {{ imovel.get_tipo_display }} em {{ imovel.bairro }}, {{ imovel.cidade }}. 
+    {% if imovel.area_util %}{{ imovel.area_util|floatformat:0 }}m²,{% endif %}
+    {% if imovel.quartos %}{{ imovel.quartos }} quartos,{% endif %}
+    {% if imovel.banheiros %}{{ imovel.banheiros }} banheiros.{% endif %}
+    {{ imovel.descricao|truncatewords:20 }}
 {% endblock %}
 
 {% block og_title %}{{ imovel.titulo }} - {{ imovel.bairro }}, {{ imovel.cidade }}{% endblock %}
+
 {% block og_description %}
-{{ imovel.get_tipo_display }} para
-{% for preco in imovel.precos.all %}{{ preco.get_finalidade_display|lower }}{% if not forloop.last %}, {% endif %}{%
-endfor %}
-em {{ imovel.cidade }}.
+    {{ imovel.get_tipo_display }} para
+    {% for preco in imovel.precos.all %}{{ preco.get_finalidade_display|lower }}{% if not forloop.last %}, {% endif %}{% endfor %}
+    em {{ imovel.cidade }}.
 {% endblock %}
 
 {% block content %}
@@ -25,8 +25,7 @@ em {{ imovel.cidade }}.
         <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Início</a></li>
             <li class="breadcrumb-item"><a href="{% url 'core:lista_imoveis' %}">Imóveis</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'core:lista_imoveis' %}?cidade={{ imovel.cidade }}">{{
-                    imovel.cidade }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'core:lista_imoveis' %}?cidade={{ imovel.cidade }}">{{ imovel.cidade }}</a></li>
             <li class="breadcrumb-item active">{{ imovel.get_tipo_display }}</li>
         </ol>
     </div>
@@ -41,9 +40,9 @@ em {{ imovel.cidade }}.
                 <div class="carousel-inner">
                     {% for foto in imovel.fotos.all %}
                     <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                        <img src="{{ foto.imagem.url }}" class="d-block w-100"
-                            alt="{{ foto.legenda|default:imovel.titulo }}"
-                            style="height: 400px; object-fit: cover; border-radius: 8px;">
+                        <img src="{{ foto.imagem.url }}" class="d-block w-100" 
+                             alt="{{ foto.legenda|default:imovel.titulo }}"
+                             style="height: 400px; object-fit: cover; border-radius: 8px;">
                         {% if foto.legenda %}
                         <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
                             <p class="mb-0">{{ foto.legenda }}</p>
@@ -52,30 +51,28 @@ em {{ imovel.cidade }}.
                     </div>
                     {% endfor %}
                 </div>
-
+                
                 {% if imovel.fotos.count > 1 %}
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselFotos"
-                    data-bs-slide="prev">
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselFotos" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
                 </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselFotos"
-                    data-bs-slide="next">
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselFotos" data-bs-slide="next">
                     <span class="carousel-control-next-icon"></span>
                 </button>
-
+                
                 <!-- Indicadores -->
                 <div class="carousel-indicators">
                     {% for foto in imovel.fotos.all %}
-                    <button type="button" data-bs-target="#carouselFotos" data-bs-slide-to="{{ forloop.counter0 }}" {%
-                        if forloop.first %}class="active" {% endif %}></button>
+                    <button type="button" data-bs-target="#carouselFotos" 
+                            data-bs-slide-to="{{ forloop.counter0 }}" 
+                            {% if forloop.first %}class="active"{% endif %}></button>
                     {% endfor %}
                 </div>
                 {% endif %}
-
+                
                 <div class="position-absolute top-0 end-0 m-3">
                     <span class="badge bg-dark bg-opacity-75">
-                        <i class="fas fa-camera me-1"></i>{{ imovel.fotos.count }} foto{{ imovel.fotos.count|pluralize
-                        }}
+                        <i class="fas fa-camera me-1"></i>{{ imovel.fotos.count }} foto{{ imovel.fotos.count|pluralize }}
                     </span>
                 </div>
             </div>
@@ -87,7 +84,7 @@ em {{ imovel.cidade }}.
                 </div>
             </div>
             {% endif %}
-
+            
             <!-- Título e Informações Básicas -->
             <div class="mb-4">
                 <div class="d-flex flex-wrap align-items-start justify-content-between mb-3">
@@ -101,21 +98,21 @@ em {{ imovel.cidade }}.
                     <div class="text-end">
                         <!-- Badges de finalidade -->
                         {% for preco in imovel.precos.all %}
-                        {% if preco.finalidade == 'venda' %}
-                        <span class="badge bg-success fs-6 me-1">Venda</span>
-                        {% elif preco.finalidade == 'aluguel' %}
-                        <span class="badge bg-primary fs-6 me-1">Aluguel</span>
-                        {% elif preco.finalidade == 'temporada' %}
-                        <span class="badge bg-warning fs-6 me-1">Temporada</span>
-                        {% endif %}
+                            {% if preco.finalidade == 'venda' %}
+                                <span class="badge bg-success fs-6 me-1">Venda</span>
+                            {% elif preco.finalidade == 'aluguel' %}
+                                <span class="badge bg-primary fs-6 me-1">Aluguel</span>
+                            {% elif preco.finalidade == 'temporada' %}
+                                <span class="badge bg-warning fs-6 me-1">Temporada</span>
+                            {% endif %}
                         {% endfor %}
-
+                        
                         {% if imovel.recem_publicado %}
-                        <span class="badge bg-danger fs-6">Novo</span>
+                            <span class="badge bg-danger fs-6">Novo</span>
                         {% endif %}
                     </div>
                 </div>
-
+                
                 <!-- Preços -->
                 <div class="mb-3">
                     {% for preco in imovel.precos.all %}
@@ -123,20 +120,20 @@ em {{ imovel.cidade }}.
                         <div>
                             <h4 class="text-success fw-bold mb-1">
                                 {% if preco.finalidade == 'temporada' %}
-                                R$ {{ preco.valor|floatformat:0 }}<small>/diária</small>
+                                    R$ {{ preco.valor|floatformat:0 }}<small>/diária</small>
                                 {% else %}
-                                R$ {{ preco.valor|floatformat:0 }}
+                                    R$ {{ preco.valor|floatformat:0 }}
                                 {% endif %}
                             </h4>
                             <small class="text-muted">{{ preco.get_finalidade_display }}</small>
-
+                            
                             {% if preco.finalidade == 'temporada' and preco.diaria_minima %}
-                            <small class="text-muted"> • Mín: {{ preco.diaria_minima }} diárias</small>
+                                <small class="text-muted"> • Mín: {{ preco.diaria_minima }} diárias</small>
                             {% endif %}
                         </div>
-
-                        <a href="https://wa.me/5511999999999?text={{ whatsapp_msg|urlencode }} - {{ preco.get_finalidade_display }}: R$ {{ preco.valor|floatformat:0 }}"
-                            class="btn btn-whatsapp" target="_blank">
+                        
+                        <a href="https://wa.me/5511999999999?text={{ whatsapp_msg|urlencode }} - {{ preco.get_finalidade_display }}: R$ {{ preco.valor|floatformat:0 }}" 
+                           class="btn btn-whatsapp" target="_blank">
                             <i class="fab fa-whatsapp me-1"></i>Interessado
                         </a>
                     </div>
@@ -148,7 +145,7 @@ em {{ imovel.cidade }}.
                     {% endfor %}
                 </div>
             </div>
-
+            
             <!-- Características Principais -->
             <div class="row g-4 mb-4">
                 {% if imovel.area_util %}
@@ -160,7 +157,7 @@ em {{ imovel.cidade }}.
                     </div>
                 </div>
                 {% endif %}
-
+                
                 {% if imovel.quartos %}
                 <div class="col-6 col-md-3">
                     <div class="text-center p-3 bg-light rounded">
@@ -170,7 +167,7 @@ em {{ imovel.cidade }}.
                     </div>
                 </div>
                 {% endif %}
-
+                
                 {% if imovel.banheiros %}
                 <div class="col-6 col-md-3">
                     <div class="text-center p-3 bg-light rounded">
@@ -180,7 +177,7 @@ em {{ imovel.cidade }}.
                     </div>
                 </div>
                 {% endif %}
-
+                
                 {% if imovel.vagas_garagem %}
                 <div class="col-6 col-md-3">
                     <div class="text-center p-3 bg-light rounded">
@@ -191,7 +188,7 @@ em {{ imovel.cidade }}.
                 </div>
                 {% endif %}
             </div>
-
+            
             <!-- Descrição -->
             {% if imovel.descricao %}
             <div class="mb-4">
@@ -201,7 +198,7 @@ em {{ imovel.cidade }}.
                 </div>
             </div>
             {% endif %}
-
+            
             <!-- Detalhes Completos -->
             <div class="mb-4">
                 <h5 class="fw-bold mb-3">Detalhes do Imóvel</h5>
@@ -213,54 +210,54 @@ em {{ imovel.cidade }}.
                                 <li><strong>Tipo:</strong> {{ imovel.get_tipo_display }}</li>
                                 <li><strong>Status:</strong> {{ imovel.get_status_display }}</li>
                                 {% if imovel.area_total %}
-                                <li><strong>Área Total:</strong> {{ imovel.area_total|floatformat:0 }} m²</li>
+                                    <li><strong>Área Total:</strong> {{ imovel.area_total|floatformat:0 }} m²</li>
                                 {% endif %}
                                 {% if imovel.suites %}
-                                <li><strong>Suítes:</strong> {{ imovel.suites }}</li>
+                                    <li><strong>Suítes:</strong> {{ imovel.suites }}</li>
                                 {% endif %}
                                 {% if imovel.andar %}
-                                <li><strong>Andar:</strong> {{ imovel.andar }}</li>
+                                    <li><strong>Andar:</strong> {{ imovel.andar }}</li>
                                 {% endif %}
                                 {% if imovel.ano_construcao %}
-                                <li><strong>Ano:</strong> {{ imovel.ano_construcao }}</li>
+                                    <li><strong>Ano:</strong> {{ imovel.ano_construcao }}</li>
                                 {% endif %}
                             </ul>
                         </div>
                     </div>
-
+                    
                     <div class="col-md-6">
                         <div class="bg-light p-3 rounded">
                             <h6 class="fw-bold mb-2">Características</h6>
                             <ul class="list-unstyled mb-0">
                                 <li><strong>Mobília:</strong> {{ imovel.get_mobilia_display }}</li>
                                 <li>
-                                    <strong>Pet Friendly:</strong>
+                                    <strong>Pet Friendly:</strong> 
                                     {% if imovel.pet_friendly %}
-                                    <span class="text-success">Sim</span>
+                                        <span class="text-success">Sim</span>
                                     {% else %}
-                                    <span class="text-danger">Não</span>
+                                        <span class="text-danger">Não</span>
                                     {% endif %}
                                 </li>
                                 <li>
-                                    <strong>Aceita Financiamento:</strong>
+                                    <strong>Aceita Financiamento:</strong> 
                                     {% if imovel.aceita_financiamento %}
-                                    <span class="text-success">Sim</span>
+                                        <span class="text-success">Sim</span>
                                     {% else %}
-                                    <span class="text-danger">Não</span>
+                                        <span class="text-danger">Não</span>
                                     {% endif %}
                                 </li>
                                 {% if imovel.valor_condominio %}
-                                <li><strong>Condomínio:</strong> R$ {{ imovel.valor_condominio|floatformat:2 }}</li>
+                                    <li><strong>Condomínio:</strong> R$ {{ imovel.valor_condominio|floatformat:2 }}</li>
                                 {% endif %}
                                 {% if imovel.valor_iptu %}
-                                <li><strong>IPTU:</strong> R$ {{ imovel.valor_iptu|floatformat:2 }}</li>
+                                    <li><strong>IPTU:</strong> R$ {{ imovel.valor_iptu|floatformat:2 }}</li>
                                 {% endif %}
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
-
+            
             <!-- Infraestrutura do Condomínio -->
             {% if imovel.infraestrutura.all %}
             <div class="mb-4">
@@ -270,9 +267,9 @@ em {{ imovel.cidade }}.
                     <div class="col-md-6">
                         <div class="d-flex align-items-center bg-light p-2 rounded">
                             {% if infra.icone %}
-                            <i class="{{ infra.icone }} text-primary me-2"></i>
+                                <i class="{{ infra.icone }} text-primary me-2"></i>
                             {% else %}
-                            <i class="fas fa-check text-primary me-2"></i>
+                                <i class="fas fa-check text-primary me-2"></i>
                             {% endif %}
                             {{ infra.nome }}
                         </div>
@@ -282,7 +279,7 @@ em {{ imovel.cidade }}.
             </div>
             {% endif %}
         </div>
-
+        
         <!-- Sidebar -->
         <div class="col-lg-4">
             <!-- Card de Contato -->
@@ -294,64 +291,62 @@ em {{ imovel.cidade }}.
                 </div>
                 <div class="card-body">
                     <p class="card-text mb-3">Entre em contato conosco para mais informações ou agendar uma visita.</p>
-
+                    
                     <!-- Preço resumo -->
                     {% for preco in imovel.precos.all %}
                     <div class="text-center mb-3">
                         <div class="h4 text-success fw-bold">
                             {% if preco.finalidade == 'temporada' %}
-                            R$ {{ preco.valor|floatformat:0 }}/dia
+                                R$ {{ preco.valor|floatformat:0 }}/dia
                             {% else %}
-                            R$ {{ preco.valor|floatformat:0 }}
+                                R$ {{ preco.valor|floatformat:0 }}
                             {% endif %}
                         </div>
                         <small class="text-muted">{{ preco.get_finalidade_display }}</small>
                     </div>
-                    {% if not forloop.last %}
-                    <hr>{% endif %}
+                    {% if not forloop.last %}<hr>{% endif %}
                     {% empty %}
                     <div class="text-center mb-3">
                         <div class="h4 text-muted">Consulte valores</div>
                     </div>
                     {% endfor %}
-
+                    
                     <div class="d-grid gap-2">
-                        <a href="https://wa.me/5511999999999?text={{ whatsapp_msg|urlencode }}"
-                            class="btn btn-whatsapp btn-lg" target="_blank">
+                        <a href="https://wa.me/5511999999999?text={{ whatsapp_msg|urlencode }}" 
+                           class="btn btn-whatsapp btn-lg" target="_blank">
                             <i class="fab fa-whatsapp me-2"></i>WhatsApp
                         </a>
                         <a href="tel:+5511999999999" class="btn btn-outline-primary">
                             <i class="fas fa-phone me-2"></i>(11) 99999-9999
                         </a>
-                        <a href="mailto:contato@imobiliaria.com.br?subject=Interesse no imóvel: {{ imovel.titulo }}"
-                            class="btn btn-outline-secondary">
+                        <a href="mailto:contato@imobiliaria.com.br?subject=Interesse no imóvel: {{ imovel.titulo }}" 
+                           class="btn btn-outline-secondary">
                             <i class="fas fa-envelope me-2"></i>E-mail
                         </a>
                     </div>
-
+                    
                     <hr>
-
+                    
                     <!-- Compartilhar -->
                     <div class="text-center">
                         <small class="text-muted d-block mb-2">Compartilhar:</small>
                         <div class="d-flex justify-content-center gap-2">
-                            <a href="https://wa.me/?text=Confira este imóvel: {{ request.build_absolute_uri }}"
-                                class="btn btn-sm btn-outline-success" target="_blank">
+                            <a href="https://wa.me/?text=Confira este imóvel: {{ request.build_absolute_uri }}" 
+                               class="btn btn-sm btn-outline-success" target="_blank">
                                 <i class="fab fa-whatsapp"></i>
                             </a>
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
-                                class="btn btn-sm btn-outline-primary" target="_blank">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
+                               class="btn btn-sm btn-outline-primary" target="_blank">
                                 <i class="fab fa-facebook"></i>
                             </a>
-                            <button class="btn btn-sm btn-outline-secondary"
-                                onclick="navigator.clipboard.writeText('{{ request.build_absolute_uri }}')">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="navigator.clipboard.writeText('{{ request.build_absolute_uri }}')">
                                 <i class="fas fa-link"></i>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-
+            
             <!-- Dados do Proprietário -->
             <div class="card mb-4">
                 <div class="card-body">
@@ -366,7 +361,7 @@ em {{ imovel.cidade }}.
                     {% endif %}
                 </div>
             </div>
-
+            
             <!-- Localização -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -379,11 +374,11 @@ em {{ imovel.cidade }}.
                         {{ imovel.cidade }} - {{ imovel.estado }}<br>
                         CEP: {{ imovel.cep }}
                     </address>
-
+                    
                     {% if imovel.latitude and imovel.longitude %}
                     <div class="mt-3">
-                        <a href="https://maps.google.com/?q={{ imovel.latitude }},{{ imovel.longitude }}"
-                            target="_blank" class="btn btn-outline-primary btn-sm">
+                        <a href="https://maps.google.com/?q={{ imovel.latitude }},{{ imovel.longitude }}" 
+                           target="_blank" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-map-marked-alt me-1"></i>Ver no Mapa
                         </a>
                     </div>
@@ -392,7 +387,7 @@ em {{ imovel.cidade }}.
             </div>
         </div>
     </div>
-
+    
     <!-- Imóveis Similares -->
     {% if imoveis_similares %}
     <div class="mt-5">
@@ -403,35 +398,39 @@ em {{ imovel.cidade }}.
                 <div class="card card-imovel h-100">
                     <div class="position-relative">
                         {% if imovel_similar.foto_capa %}
-                        <img src="{{ imovel_similar.foto_capa.imagem.url }}" class="card-img-top foto-capa"
-                            alt="{{ imovel_similar.titulo }}" style="height: 150px;">
+                            <img src="{{ imovel_similar.foto_capa.imagem.url }}" 
+                                 class="card-img-top foto-capa" 
+                                 alt="{{ imovel_similar.titulo }}"
+                                 style="height: 150px;">
                         {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 150px;">
-                            <i class="fas fa-image fs-3 text-muted"></i>
-                        </div>
+                            <div class="bg-light d-flex align-items-center justify-content-center" 
+                                 style="height: 150px;">
+                                <i class="fas fa-image fs-3 text-muted"></i>
+                            </div>
                         {% endif %}
                     </div>
-
+                    
                     <div class="card-body">
                         <h6 class="card-title">{{ imovel_similar.titulo|truncatechars:30 }}</h6>
-
-                        {% for preco in imovel_similar.precos.all %}
-                        <div class="text-success fw-bold mb-2">
-                            {% if preco.finalidade == 'temporada' %}
-                            R$ {{ preco.valor|floatformat:0 }}/dia
-                            {% else %}
-                            R$ {{ preco.valor|floatformat:0 }}
-                            {% endif %}
-                        </div>
-                        {% if forloop.first %}{% break %}{% endif %}
-                        {% endfor %}
-
+                        
+                        {% if imovel_similar.precos.all %}
+                            {% with imovel_similar.precos.all|first as primeiro_preco %}
+                                <div class="text-success fw-bold mb-2">
+                                    {% if primeiro_preco.finalidade == 'temporada' %}
+                                        R$ {{ primeiro_preco.valor|floatformat:0 }}/dia
+                                    {% else %}
+                                        R$ {{ primeiro_preco.valor|floatformat:0 }}
+                                    {% endif %}
+                                </div>
+                            {% endwith %}
+                        {% endif %}
+                        
                         <p class="card-text text-muted small">
                             {{ imovel_similar.bairro }}, {{ imovel_similar.cidade }}
                         </p>
-
-                        <a href="{% url 'core:detalhe_imovel' imovel_similar.pk %}"
-                            class="btn btn-outline-primary btn-sm w-100">
+                        
+                        <a href="{% url 'core:detalhe_imovel' imovel_similar.pk %}" 
+                           class="btn btn-outline-primary btn-sm w-100">
                             Ver Detalhes
                         </a>
                     </div>
@@ -448,7 +447,7 @@ em {{ imovel.cidade }}.
 <script>
     // Copiar link para clipboard
     function copiarLink() {
-        navigator.clipboard.writeText(window.location.href).then(function () {
+        navigator.clipboard.writeText(window.location.href).then(function() {
             alert('Link copiado para a área de transferência!');
         });
     }
