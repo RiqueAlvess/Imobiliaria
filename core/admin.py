@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.db import models
 from django.forms import Textarea
-from .models import Proprietario, Imovel, PrecoPorFinalidade, FotoImovel, InfraCondominio
+from django.utils import timezone
+from .models import Proprietario, Imovel, Cliente, PrecoPorFinalidade, FotoImovel, InfraCondominio
 
 
 @admin.register(Proprietario)
@@ -23,24 +24,141 @@ class ProprietarioAdmin(admin.ModelAdmin):
     )
     
     def total_imoveis(self, obj):
-        return obj.imoveis.count()
+        count = obj.imoveis.count()
+        if count > 0:
+            return format_html(
+                '<span style="color: #C8A866; font-weight: bold;">{}</span>',
+                count
+            )
+        return format_html('<span style="color: #7A7A7A;">0</span>')
     total_imoveis.short_description = 'Total de Imóveis'
 
 
-@admin.register(InfraCondominio)
-class InfraCondominioAdmin(admin.ModelAdmin):
-    list_display = ['nome', 'icone_preview', 'total_imoveis']
-    search_fields = ['nome']
+@admin.register(Cliente)
+class ClienteAdmin(admin.ModelAdmin):
+    list_display = [
+        'nome_completo', 'telefone', 'status_badge', 'origem_badge', 
+        'finalidade_interesse', 'orcamento_formatado', 'total_imoveis_interesse', 
+        'ultimo_contato_formatado', 'criado_em'
+    ]
+    list_filter = [
+        'status', 'origem', 'finalidade_interesse', 'criado_em', 
+        'ultimo_contato'
+    ]
+    search_fields = ['nome_completo', 'email', 'telefone']
+    readonly_fields = ['criado_em', 'atualizado_em', 'total_imoveis_interesse']
+    filter_horizontal = ['imoveis_interesse']
+    date_hierarchy = 'criado_em'
     
-    def icone_preview(self, obj):
-        if obj.icone:
-            return format_html('<i class="{}"></i> {}', obj.icone, obj.icone)
-        return '-'
-    icone_preview.short_description = 'Ícone'
+    fieldsets = (
+        ('Dados Pessoais', {
+            'fields': ('nome_completo', 'email', 'telefone')
+        }),
+        ('Gestão Comercial', {
+            'fields': ('status', 'origem', 'ultimo_contato'),
+            'classes': ('wide',)
+        }),
+        ('Preferências do Cliente', {
+            'fields': ('finalidade_interesse', 'orcamento_max', 'observacoes'),
+            'classes': ('wide',)
+        }),
+        ('Imóveis de Interesse', {
+            'fields': ('imoveis_interesse',),
+            'classes': ('wide',)
+        }),
+        ('Controle do Sistema', {
+            'fields': ('total_imoveis_interesse', 'criado_em', 'atualizado_em'),
+            'classes': ('collapse',)
+        }),
+    )
     
-    def total_imoveis(self, obj):
-        return obj.imovel_set.count()
-    total_imoveis.short_description = 'Imóveis com esta infraestrutura'
+    formfield_overrides = {
+        models.TextField: {'widget': Textarea(attrs={'rows': 3, 'cols': 80})},
+    }
+    
+    def status_badge(self, obj):
+        colors = {
+            'lead_frio': '#7A7A7A',
+            'lead_morno': '#C8A866', 
+            'lead_quente': '#D4AF37',
+            'cliente_ativo': '#1E3A5F',
+            'cliente_perdido': '#dc3545',
+            'cliente_finalizado': '#28a745'
+        }
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;">{}</span>',
+            colors.get(obj.status, '#7A7A7A'),
+            obj.get_status_display()
+        )
+    status_badge.short_description = 'Status'
+    
+    def origem_badge(self, obj):
+        icons = {
+            'site': 'fas fa-globe',
+            'whatsapp': 'fas fa-phone', 
+            'telefone': 'fas fa-phone',
+            'email': 'fas fa-envelope',
+            'indicacao': 'fas fa-user-friends',
+            'facebook': 'fas fa-share-alt',
+            'instagram': 'fas fa-share-alt',
+            'placa': 'fas fa-sign',
+            'outro': 'fas fa-question'
+        }
+        return format_html(
+            '<span style="color: #C8A866;"><i class="{} me-1"></i>{}</span>',
+            icons.get(obj.origem, 'fas fa-question'),
+            obj.get_origem_display()
+        )
+    origem_badge.short_description = 'Origem'
+    
+    def orcamento_formatado(self, obj):
+        if obj.orcamento_max:
+            try:
+                # Converter explicitamente para float e formatar
+                valor = float(obj.orcamento_max)
+                valor_formatado = f"R$ {valor:,.0f}"
+                return format_html(
+                    '<span style="color: #1E3A5F; font-weight: bold;">{}</span>',
+                    valor_formatado
+                )
+            except (ValueError, TypeError):
+                return format_html('<span style="color: #dc3545;">Valor inválido</span>')
+        return format_html('<span style="color: #7A7A7A;">-</span>')
+    orcamento_formatado.short_description = 'Orçamento'
+    
+    def ultimo_contato_formatado(self, obj):
+        if obj.ultimo_contato:
+            dias = (timezone.now().date() - obj.ultimo_contato.date()).days
+            if dias == 0:
+                return format_html('<span style="color: #28a745;">Hoje</span>')
+            elif dias == 1:
+                return format_html('<span style="color: #C8A866;">Ontem</span>')
+            elif dias <= 7:
+                return format_html('<span style="color: #ffc107;">{} dias</span>', dias)
+            else:
+                return format_html('<span style="color: #dc3545;">{} dias</span>', dias)
+        return format_html('<span style="color: #7A7A7A;">Nunca</span>')
+    ultimo_contato_formatado.short_description = 'Último Contato'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('imoveis_interesse')
+    
+    actions = ['marcar_como_lead_quente', 'marcar_como_cliente_ativo', 'atualizar_ultimo_contato']
+    
+    def marcar_como_lead_quente(self, request, queryset):
+        count = queryset.update(status='lead_quente')
+        self.message_user(request, f'{count} cliente(s) marcado(s) como Lead Quente.')
+    marcar_como_lead_quente.short_description = 'Marcar como Lead Quente'
+    
+    def marcar_como_cliente_ativo(self, request, queryset):
+        count = queryset.update(status='cliente_ativo')
+        self.message_user(request, f'{count} cliente(s) marcado(s) como Cliente Ativo.')
+    marcar_como_cliente_ativo.short_description = 'Marcar como Cliente Ativo'
+    
+    def atualizar_ultimo_contato(self, request, queryset):
+        count = queryset.update(ultimo_contato=timezone.now())
+        self.message_user(request, f'Último contato atualizado para {count} cliente(s).')
+    atualizar_ultimo_contato.short_description = 'Atualizar último contato para hoje'
 
 
 class PrecoPorFinalidadeInline(admin.TabularInline):
@@ -64,7 +182,7 @@ class FotoImovelInline(admin.TabularInline):
     def preview(self, obj):
         if obj.imagem:
             return format_html(
-                '<img src="{}" style="max-height: 60px; max-width: 80px; border-radius: 4px;" />',
+                '<img src="{}" style="max-height: 60px; max-width: 80px; border-radius: 4px; border: 2px solid #C8A866;" />',
                 obj.imagem.url
             )
         return '-'
@@ -74,7 +192,7 @@ class FotoImovelInline(admin.TabularInline):
 @admin.register(Imovel)
 class ImovelAdmin(admin.ModelAdmin):
     list_display = [
-        'titulo_resumido', 'proprietario', 'tipo', 'cidade', 'bairro', 
+        'titulo_resumido', 'proprietario', 'tipo_badge', 'cidade', 'bairro', 
         'status_badge', 'preco_resumo', 'quartos', 'tem_fotos_badge', 'criado_em'
     ]
     list_filter = [
@@ -85,6 +203,7 @@ class ImovelAdmin(admin.ModelAdmin):
     readonly_fields = ['criado_em', 'atualizado_em']
     filter_horizontal = ['infraestrutura']
     inlines = [PrecoPorFinalidadeInline, FotoImovelInline]
+    date_hierarchy = 'criado_em'
     
     fieldsets = (
         ('Informações Básicas', {
@@ -123,20 +242,28 @@ class ImovelAdmin(admin.ModelAdmin):
     }
     
     def titulo_resumido(self, obj):
-        return obj.titulo[:50] + '...' if len(obj.titulo) > 50 else obj.titulo
+        titulo = obj.titulo[:50] + '...' if len(obj.titulo) > 50 else obj.titulo
+        return format_html('<span style="color: #0D0D0D; font-weight: 500;">{}</span>', titulo)
     titulo_resumido.short_description = 'Título'
+    
+    def tipo_badge(self, obj):
+        return format_html(
+            '<span style="background-color: #1E3A5F; color: white; padding: 3px 8px; border-radius: 8px; font-size: 0.8rem;">{}</span>',
+            obj.get_tipo_display()
+        )
+    tipo_badge.short_description = 'Tipo'
     
     def status_badge(self, obj):
         colors = {
-            'ativo': 'success',
-            'vendido': 'danger',
-            'alugado': 'warning',
-            'reservado': 'info',
-            'inativo': 'secondary'
+            'ativo': '#28a745',
+            'vendido': '#dc3545',
+            'alugado': '#ffc107',
+            'reservado': '#17a2b8',
+            'inativo': '#6c757d'
         }
         return format_html(
-            '<span class="badge badge-{}">{}</span>',
-            colors.get(obj.status, 'secondary'),
+            '<span style="background-color: {}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;">{}</span>',
+            colors.get(obj.status, '#6c757d'),
             obj.get_status_display()
         )
     status_badge.short_description = 'Status'
@@ -144,33 +271,55 @@ class ImovelAdmin(admin.ModelAdmin):
     def preco_resumo(self, obj):
         precos = obj.precos.all()
         if not precos:
-            return '-'
+            return format_html('<span style="color: #7A7A7A;">-</span>')
         
         resumo = []
         for preco in precos[:2]:  # Mostrar no máximo 2 preços
-            if preco.finalidade == 'temporada':
-                resumo.append(f"R$ {preco.valor}/dia")
-            else:
-                resumo.append(f"R$ {preco.valor}")
+            try:
+                valor = float(preco.valor)
+                if preco.finalidade == 'temporada':
+                    resumo.append(f"R$ {valor:,.0f}/dia")
+                else:
+                    resumo.append(f"R$ {valor:,.0f}")
+            except (ValueError, TypeError):
+                resumo.append("Valor inválido")
         
         result = ' | '.join(resumo)
         if precos.count() > 2:
             result += '...'
-        return result
+        
+        return format_html('<span style="color: #C8A866; font-weight: bold;">{}</span>', result)
     preco_resumo.short_description = 'Preços'
     
     def tem_fotos_badge(self, obj):
         if obj.tem_fotos:
             count = obj.fotos.count()
             return format_html(
-                '<span class="badge badge-success"><i class="fas fa-camera"></i> {}</span>',
+                '<span style="background-color: #D4AF37; color: #0D0D0D; padding: 3px 8px; border-radius: 8px; font-size: 0.8rem; font-weight: bold;"><i class="fas fa-camera"></i> {}</span>',
                 count
             )
-        return format_html('<span class="badge badge-danger">Sem fotos</span>')
+        return format_html('<span style="background-color: #dc3545; color: white; padding: 3px 8px; border-radius: 8px; font-size: 0.8rem;">Sem fotos</span>')
     tem_fotos_badge.short_description = 'Fotos'
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('proprietario').prefetch_related('precos', 'fotos')
+    
+    actions = ['marcar_como_vendido', 'marcar_como_alugado', 'marcar_como_ativo']
+    
+    def marcar_como_vendido(self, request, queryset):
+        count = queryset.update(status='vendido')
+        self.message_user(request, f'{count} imóvel(is) marcado(s) como vendido(s).')
+    marcar_como_vendido.short_description = 'Marcar como vendido'
+    
+    def marcar_como_alugado(self, request, queryset):
+        count = queryset.update(status='alugado')
+        self.message_user(request, f'{count} imóvel(is) marcado(s) como alugado(s).')
+    marcar_como_alugado.short_description = 'Marcar como alugado'
+    
+    def marcar_como_ativo(self, request, queryset):
+        count = queryset.update(status='ativo')
+        self.message_user(request, f'{count} imóvel(is) marcado(s) como ativo(s).')
+    marcar_como_ativo.short_description = 'Marcar como ativo'
     
     class Media:
         css = {
@@ -179,54 +328,7 @@ class ImovelAdmin(admin.ModelAdmin):
         js = ('admin/js/custom_admin.js',)
 
 
-@admin.register(PrecoPorFinalidade)
-class PrecoPorFinalidadeAdmin(admin.ModelAdmin):
-    list_display = ['imovel', 'finalidade', 'valor_formatado', 'detalhes_temporada']
-    list_filter = ['finalidade', 'imovel__tipo', 'imovel__cidade']
-    search_fields = ['imovel__titulo', 'imovel__endereco']
-    
-    def valor_formatado(self, obj):
-        if obj.finalidade == 'temporada':
-            return f"R$ {obj.valor}/dia"
-        return f"R$ {obj.valor}"
-    valor_formatado.short_description = 'Valor'
-    
-    def detalhes_temporada(self, obj):
-        if obj.finalidade == 'temporada':
-            detalhes = []
-            if obj.diaria_minima:
-                detalhes.append(f"Mín: {obj.diaria_minima} dias")
-            if obj.capacidade_hospedes:
-                detalhes.append(f"Cap: {obj.capacidade_hospedes} pessoas")
-            if obj.taxa_limpeza:
-                detalhes.append(f"Limpeza: R$ {obj.taxa_limpeza}")
-            return ' | '.join(detalhes)
-        return '-'
-    detalhes_temporada.short_description = 'Detalhes Temporada'
-
-
-@admin.register(FotoImovel)
-class FotoImovelAdmin(admin.ModelAdmin):
-    list_display = ['preview_thumb', 'imovel', 'legenda', 'eh_capa', 'ordem', 'criado_em']
-    list_filter = ['eh_capa', 'criado_em', 'imovel__tipo']
-    search_fields = ['imovel__titulo', 'legenda']
-    list_editable = ['eh_capa', 'ordem']
-    ordering = ['imovel', 'ordem']
-    
-    def preview_thumb(self, obj):
-        if obj.imagem:
-            return format_html(
-                '<img src="{}" style="max-height: 50px; max-width: 60px; border-radius: 4px;" />',
-                obj.imagem.url
-            )
-        return '-'
-    preview_thumb.short_description = 'Preview'
-    
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related('imovel')
-
-
-# Personalizações globais do Admin
-admin.site.site_header = "Imobiliária - Administração"
-admin.site.site_title = "Imobiliária Admin"
+# Personalização global do Admin
+admin.site.site_header = "DS Imóveis - Administração"
+admin.site.site_title = "DS Imóveis Admin"
 admin.site.index_title = "Painel de Controle"

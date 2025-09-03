@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ imovel.titulo }} - {{ imovel.bairro }}, {{ imovel.cidade }} - Imobiliária{% endblock %}
+{% block title %}{{ imovel.titulo }} - {{ imovel.bairro }}, {{ imovel.cidade }} - DS Imóveis{% endblock %}
 
 {% block description %}
     {{ imovel.get_tipo_display }} em {{ imovel.bairro }}, {{ imovel.cidade }}. 
@@ -23,9 +23,9 @@
     .sticky-sidebar {
         position: -webkit-sticky;
         position: sticky;
-        top: 80px; /* Espaço para não sobrepor o header */
+        top: 100px;
         z-index: 10;
-        max-height: calc(100vh - 100px);
+        max-height: calc(100vh - 120px);
         overflow-y: auto;
     }
     
@@ -36,72 +36,372 @@
     }
     
     .navbar {
-        z-index: 1030; /* Bootstrap navbar padrão */
+        z-index: 1030;
+    }
+
+    .breadcrumb-ds {
+        background-color: var(--cinza-claro);
+        border-bottom: 2px solid var(--dourado-metalico);
+        padding: 1rem 0;
+    }
+
+    .gallery-container {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 2px solid rgba(200, 168, 102, 0.3);
+    }
+
+    .gallery-image {
+        height: 450px;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .gallery-indicators button {
+        width: 60px;
+        height: 40px;
+        background-size: cover;
+        background-position: center;
+        border: 2px solid var(--dourado-metalico);
+        border-radius: 8px;
+        opacity: 0.6;
+        transition: all 0.3s ease;
+    }
+
+    .gallery-indicators button.active {
+        opacity: 1;
+        border-color: var(--dourado-claro);
+        transform: scale(1.05);
+    }
+
+    .photo-counter {
+        background-color: var(--preto-profundo);
+        color: var(--dourado-claro);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+
+    .price-card {
+        background-color: var(--dourado-metalico);
+        color: var(--preto-profundo);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 8px 24px rgba(200, 168, 102, 0.3);
+    }
+
+    .price-value {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+    }
+
+    .characteristic-grid {
+        background: var(--branco-puro);
+        border: 2px solid var(--dourado-metalico);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 8px 24px rgba(200, 168, 102, 0.1);
+    }
+
+    .characteristic-item {
+        background: var(--cinza-claro);
+        border: 1px solid rgba(200, 168, 102, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .characteristic-item:hover {
+        background-color: var(--dourado-metalico);
+        color: var(--preto-profundo);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(200, 168, 102, 0.3);
+    }
+
+    .characteristic-icon {
+        font-size: 2.5rem;
+        color: var(--dourado-metalico);
+        margin-bottom: 1rem;
+    }
+
+    .characteristic-item:hover .characteristic-icon {
+        color: var(--preto-profundo);
+    }
+
+    .info-section {
+        background: var(--branco-puro);
+        border: 2px solid rgba(200, 168, 102, 0.2);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    }
+
+    .info-section h5 {
+        color: var(--azul-petroleo);
+        border-bottom: 2px solid var(--dourado-metalico);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .contact-card {
+        background-color: var(--azul-petroleo);
+        color: var(--branco-puro);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 12px 32px rgba(30, 58, 95, 0.4);
+        border: 2px solid var(--dourado-metalico);
+    }
+
+    .contact-card h5 {
+        color: var(--dourado-claro);
+        border-bottom: 2px solid var(--dourado-metalico);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .contact-price {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(200, 168, 102, 0.3);
+    }
+
+    .contact-price .price {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--dourado-claro);
+    }
+
+    .btn-contact-primary {
+        background-color: var(--dourado-metalico);
+        border: none;
+        color: var(--preto-profundo);
+        font-weight: 700;
+        padding: 12px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-contact-primary:hover {
+        background-color: var(--dourado-claro);
+        color: var(--preto-profundo);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(200, 168, 102, 0.4);
+    }
+
+    .btn-contact-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid var(--dourado-metalico);
+        color: var(--branco-puro);
+        font-weight: 600;
+        padding: 10px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-contact-secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: var(--dourado-claro);
+        transform: translateY(-2px);
+    }
+
+    .infrastructure-item {
+        background: var(--cinza-claro);
+        border: 1px solid rgba(200, 168, 102, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .infrastructure-item:hover {
+        background: var(--dourado-metalico);
+        color: var(--preto-profundo);
+        transform: translateY(-2px);
+    }
+
+    .infrastructure-item i {
+        color: var(--azul-petroleo);
+    }
+
+    .infrastructure-item:hover i {
+        color: var(--preto-profundo);
+    }
+
+    .owner-card {
+        background: var(--cinza-claro);
+        border: 2px solid rgba(200, 168, 102, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+
+    .location-card {
+        background: var(--branco-puro);
+        border: 2px solid rgba(200, 168, 102, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+
+    .similar-property-card {
+        border: 1px solid rgba(200, 168, 102, 0.2);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .similar-property-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        border-color: var(--dourado-metalico);
+    }
+
+    .similar-property-image {
+        height: 180px;
+        object-fit: cover;
+    }
+
+    .share-buttons a {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 0.25rem;
+        transition: all 0.3s ease;
+    }
+
+    .share-whatsapp {
+        background-color: #25d366;
+        color: white;
+    }
+
+    .share-facebook {
+        background-color: #1877f2;
+        color: white;
+    }
+
+    .share-link {
+        background-color: var(--cinza-medio);
+        color: white;
+    }
+
+    .share-buttons a:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .badge-ds-detail {
+        background-color: var(--dourado-metalico);
+        color: var(--preto-profundo);
+        font-weight: bold;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+    }
+
+    .details-table {
+        background: var(--branco-puro);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(200, 168, 102, 0.2);
+    }
+
+    .details-table .table th {
+        background: var(--cinza-claro);
+        color: var(--azul-petroleo);
+        font-weight: 700;
+        border: none;
+        padding: 1rem;
+    }
+
+    .details-table .table td {
+        padding: 1rem;
+        border-color: rgba(200, 168, 102, 0.1);
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <!-- Breadcrumb -->
-<nav class="bg-light py-2">
+<nav class="breadcrumb-ds">
     <div class="container">
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Início</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'core:lista_imoveis' %}">Imóveis</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'core:lista_imoveis' %}?cidade={{ imovel.cidade }}">{{ imovel.cidade }}</a></li>
-            <li class="breadcrumb-item active">{{ imovel.get_tipo_display }}</li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'core:home' %}" class="text-decoration-none text-primary-custom">
+                    <i class="fas fa-home me-1"></i>Início
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'core:lista_imoveis' %}" class="text-decoration-none text-primary-custom">Imóveis</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'core:lista_imoveis' %}?cidade={{ imovel.cidade }}" class="text-decoration-none text-primary-custom">{{ imovel.cidade }}</a>
+            </li>
+            <li class="breadcrumb-item active text-secondary-custom">{{ imovel.get_tipo_display }}</li>
         </ol>
     </div>
 </nav>
 
-<div class="container my-4">
+<div class="container my-5">
     <div class="row">
         <div class="col-lg-8">
             <!-- Galeria de Fotos -->
             {% if imovel.fotos.all %}
-            <div id="carouselFotos" class="carousel slide mb-4" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    {% for foto in imovel.fotos.all %}
-                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                        <img src="{{ foto.imagem.url }}" class="d-block w-100" 
-                             alt="{{ foto.legenda|default:imovel.titulo }}"
-                             style="height: 400px; object-fit: cover; border-radius: 8px;">
-                        {% if foto.legenda %}
-                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
-                            <p class="mb-0">{{ foto.legenda }}</p>
+            <div class="gallery-container mb-4">
+                <div id="carouselFotos" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for foto in imovel.fotos.all %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ foto.imagem.url }}" class="gallery-image" 
+                                 alt="{{ foto.legenda|default:imovel.titulo }}">
+                            {% if foto.legenda %}
+                            <div class="carousel-caption d-none d-md-block">
+                                <div class="bg-dark bg-opacity-75 rounded px-3 py-2">
+                                    <p class="mb-0">{{ foto.legenda }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
+                        {% endfor %}
                     </div>
-                    {% endfor %}
-                </div>
-                
-                {% if imovel.fotos.count > 1 %}
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselFotos" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon"></span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselFotos" data-bs-slide="next">
-                    <span class="carousel-control-next-icon"></span>
-                </button>
-                
-                <!-- Indicadores -->
-                <div class="carousel-indicators">
-                    {% for foto in imovel.fotos.all %}
-                    <button type="button" data-bs-target="#carouselFotos" 
-                            data-bs-slide-to="{{ forloop.counter0 }}" 
-                            {% if forloop.first %}class="active"{% endif %}></button>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                
-                <div class="position-absolute top-0 end-0 m-3">
-                    <span class="badge bg-dark bg-opacity-75">
-                        <i class="fas fa-camera me-1"></i>{{ imovel.fotos.count }} foto{{ imovel.fotos.count|pluralize }}
-                    </span>
+                    
+                    {% if imovel.fotos.count > 1 %}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselFotos" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselFotos" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                    
+                    <!-- Indicadores -->
+                    <div class="carousel-indicators" style="position: static; margin-top: 1rem;">
+                        {% for foto in imovel.fotos.all %}
+                        <button type="button" data-bs-target="#carouselFotos" 
+                                data-bs-slide-to="{{ forloop.counter0 }}" 
+                                {% if forloop.first %}class="active"{% endif %}
+                                style="background-image: url('{{ foto.imagem.url }}');">
+                        </button>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="position-absolute top-0 end-0 m-3">
+                        <span class="photo-counter">
+                            <i class="fas fa-camera me-2"></i>{{ imovel.fotos.count }} foto{{ imovel.fotos.count|pluralize }}
+                        </span>
+                    </div>
                 </div>
             </div>
             {% else %}
-            <div class="bg-light rounded d-flex align-items-center justify-content-center mb-4" style="height: 400px;">
-                <div class="text-center text-muted">
+            <div class="gallery-container bg-light-custom d-flex align-items-center justify-content-center mb-4" style="height: 400px;">
+                <div class="text-center text-secondary-custom">
                     <i class="fas fa-image fs-1 mb-3"></i>
                     <p>Sem fotos disponíveis</p>
                 </div>
@@ -112,9 +412,9 @@
             <div class="mb-4">
                 <div class="d-flex flex-wrap align-items-start justify-content-between mb-3">
                     <div>
-                        <h1 class="h3 fw-bold mb-2">{{ imovel.titulo }}</h1>
-                        <p class="text-muted mb-0">
-                            <i class="fas fa-map-marker-alt me-1"></i>
+                        <h1 class="h2 fw-bold mb-2 text-primary-custom">{{ imovel.titulo }}</h1>
+                        <p class="text-secondary-custom mb-2">
+                            <i class="fas fa-map-marker-alt me-2 text-primary-custom"></i>
                             {{ imovel.endereco }}, {{ imovel.bairro }}, {{ imovel.cidade }} - {{ imovel.estado }}
                         </p>
                     </div>
@@ -122,179 +422,227 @@
                         <!-- Badges de finalidade -->
                         {% for preco in imovel.precos.all %}
                             {% if preco.finalidade == 'venda' %}
-                                <span class="badge bg-success fs-6 me-1">Venda</span>
+                                <span class="badge-ds-detail me-2">
+                                    <i class="fas fa-tag me-1"></i>Venda
+                                </span>
                             {% elif preco.finalidade == 'aluguel' %}
-                                <span class="badge bg-primary fs-6 me-1">Aluguel</span>
+                                <span class="badge-ds-detail me-2">
+                                    <i class="fas fa-key me-1"></i>Aluguel
+                                </span>
                             {% elif preco.finalidade == 'temporada' %}
-                                <span class="badge bg-warning fs-6 me-1">Temporada</span>
+                                <span class="badge-ds-detail me-2">
+                                    <i class="fas fa-calendar-alt me-1"></i>Temporada
+                                </span>
                             {% endif %}
                         {% endfor %}
                         
                         {% if imovel.recem_publicado %}
-                            <span class="badge bg-danger fs-6">Novo</span>
+                            <span class="badge bg-danger">
+                                <i class="fas fa-star me-1"></i>Novo
+                            </span>
                         {% endif %}
                     </div>
                 </div>
                 
-                <!-- Preços -->
-                <div class="mb-3">
-                    {% for preco in imovel.precos.all %}
-                    <div class="d-flex align-items-center justify-content-between bg-light p-3 rounded mb-2">
+                <!-- Cards de Preços -->
+                {% for preco in imovel.precos.all %}
+                <div class="price-card">
+                    <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <h4 class="text-success fw-bold mb-1">
+                            <div class="price-value">
                                 {% if preco.finalidade == 'temporada' %}
                                     R$ {{ preco.valor|floatformat:0 }}<small>/diária</small>
                                 {% else %}
                                     R$ {{ preco.valor|floatformat:0 }}
                                 {% endif %}
-                            </h4>
-                            <small class="text-muted">{{ preco.get_finalidade_display }}</small>
+                            </div>
+                            <div class="fw-bold">{{ preco.get_finalidade_display }}</div>
                             
                             {% if preco.finalidade == 'temporada' and preco.diaria_minima %}
-                                <small class="text-muted"> • Mín: {{ preco.diaria_minima }} diárias</small>
+                                <small>Mínimo: {{ preco.diaria_minima }} diárias</small>
                             {% endif %}
                         </div>
                         
                         <a href="https://wa.me/5511999999999?text={{ whatsapp_msg|urlencode }} - {{ preco.get_finalidade_display }}: R$ {{ preco.valor|floatformat:0 }}" 
-                           class="btn btn-whatsapp" target="_blank">
-                            <i class="fab fa-whatsapp me-1"></i>Interessado
+                           class="btn btn-contact-primary" target="_blank">
+                            <i class="fab fa-whatsapp me-2"></i>Tenho Interesse
                         </a>
                     </div>
-                    {% empty %}
-                    <div class="bg-light p-3 rounded mb-2">
-                        <h4 class="text-muted mb-1">Consulte valores</h4>
-                        <small class="text-muted">Entre em contato para saber os preços</small>
-                    </div>
-                    {% endfor %}
                 </div>
+                {% empty %}
+                <div class="price-card text-center">
+                    <div class="price-value">Consulte valores</div>
+                    <div>Entre em contato para saber os preços</div>
+                </div>
+                {% endfor %}
             </div>
             
             <!-- Características Principais -->
-            <div class="row g-4 mb-4">
-                {% if imovel.area_util %}
-                <div class="col-6 col-md-3">
-                    <div class="text-center p-3 bg-light rounded">
-                        <i class="fas fa-expand-arrows-alt text-primary fs-3 mb-2"></i>
-                        <div class="fw-bold">{{ imovel.area_util|floatformat:0 }} m²</div>
-                        <small class="text-muted">Área Útil</small>
-                    </div>
-                </div>
-                {% endif %}
+            <div class="characteristic-grid mb-4">
+                <h5 class="fw-bold mb-4 text-primary-custom">
+                    <i class="fas fa-star me-2"></i>Características Principais
+                </h5>
                 
-                {% if imovel.quartos %}
-                <div class="col-6 col-md-3">
-                    <div class="text-center p-3 bg-light rounded">
-                        <i class="fas fa-bed text-primary fs-3 mb-2"></i>
-                        <div class="fw-bold">{{ imovel.quartos }}</div>
-                        <small class="text-muted">Quarto{{ imovel.quartos|pluralize }}</small>
+                <div class="row g-4">
+                    {% if imovel.area_util %}
+                    <div class="col-6 col-md-3">
+                        <div class="characteristic-item">
+                            <i class="fas fa-expand-arrows-alt characteristic-icon"></i>
+                            <div class="fw-bold fs-5">{{ imovel.area_util|floatformat:0 }} m²</div>
+                            <small>Área Útil</small>
+                        </div>
                     </div>
-                </div>
-                {% endif %}
-                
-                {% if imovel.banheiros %}
-                <div class="col-6 col-md-3">
-                    <div class="text-center p-3 bg-light rounded">
-                        <i class="fas fa-bath text-primary fs-3 mb-2"></i>
-                        <div class="fw-bold">{{ imovel.banheiros }}</div>
-                        <small class="text-muted">Banheiro{{ imovel.banheiros|pluralize }}</small>
+                    {% endif %}
+                    
+                    {% if imovel.quartos %}
+                    <div class="col-6 col-md-3">
+                        <div class="characteristic-item">
+                            <i class="fas fa-bed characteristic-icon"></i>
+                            <div class="fw-bold fs-5">{{ imovel.quartos }}</div>
+                            <small>Quarto{{ imovel.quartos|pluralize }}</small>
+                        </div>
                     </div>
-                </div>
-                {% endif %}
-                
-                {% if imovel.vagas_garagem %}
-                <div class="col-6 col-md-3">
-                    <div class="text-center p-3 bg-light rounded">
-                        <i class="fas fa-car text-primary fs-3 mb-2"></i>
-                        <div class="fw-bold">{{ imovel.vagas_garagem }}</div>
-                        <small class="text-muted">Vaga{{ imovel.vagas_garagem|pluralize }}</small>
+                    {% endif %}
+                    
+                    {% if imovel.banheiros %}
+                    <div class="col-6 col-md-3">
+                        <div class="characteristic-item">
+                            <i class="fas fa-bath characteristic-icon"></i>
+                            <div class="fw-bold fs-5">{{ imovel.banheiros }}</div>
+                            <small>Banheiro{{ imovel.banheiros|pluralize }}</small>
+                        </div>
                     </div>
+                    {% endif %}
+                    
+                    {% if imovel.vagas_garagem %}
+                    <div class="col-6 col-md-3">
+                        <div class="characteristic-item">
+                            <i class="fas fa-car characteristic-icon"></i>
+                            <div class="fw-bold fs-5">{{ imovel.vagas_garagem }}</div>
+                            <small>Vaga{{ imovel.vagas_garagem|pluralize }}</small>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
             
             <!-- Descrição -->
             {% if imovel.descricao %}
-            <div class="mb-4">
-                <h5 class="fw-bold mb-3">Descrição</h5>
-                <div class="bg-light p-3 rounded">
+            <div class="info-section">
+                <h5 class="fw-bold">
+                    <i class="fas fa-align-left me-2"></i>Descrição do Imóvel
+                </h5>
+                <div class="text-secondary-custom">
                     {{ imovel.descricao|linebreaks }}
                 </div>
             </div>
             {% endif %}
             
             <!-- Detalhes Completos -->
-            <div class="mb-4">
-                <h5 class="fw-bold mb-3">Detalhes do Imóvel</h5>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="bg-light p-3 rounded">
-                            <h6 class="fw-bold mb-2">Informações Básicas</h6>
-                            <ul class="list-unstyled mb-0">
-                                <li><strong>Tipo:</strong> {{ imovel.get_tipo_display }}</li>
-                                <li><strong>Status:</strong> {{ imovel.get_status_display }}</li>
-                                {% if imovel.area_total %}
-                                    <li><strong>Área Total:</strong> {{ imovel.area_total|floatformat:0 }} m²</li>
-                                {% endif %}
-                                {% if imovel.suites %}
-                                    <li><strong>Suítes:</strong> {{ imovel.suites }}</li>
-                                {% endif %}
-                                {% if imovel.andar %}
-                                    <li><strong>Andar:</strong> {{ imovel.andar }}</li>
-                                {% endif %}
-                                {% if imovel.ano_construcao %}
-                                    <li><strong>Ano:</strong> {{ imovel.ano_construcao }}</li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <div class="bg-light p-3 rounded">
-                            <h6 class="fw-bold mb-2">Características</h6>
-                            <ul class="list-unstyled mb-0">
-                                <li><strong>Mobília:</strong> {{ imovel.get_mobilia_display }}</li>
-                                <li>
-                                    <strong>Pet Friendly:</strong> 
+            <div class="info-section">
+                <h5 class="fw-bold">
+                    <i class="fas fa-list me-2"></i>Detalhes Completos
+                </h5>
+                <div class="details-table">
+                    <table class="table table-hover mb-0">
+                        <tbody>
+                            <tr>
+                                <th style="width: 30%;">Tipo</th>
+                                <td>{{ imovel.get_tipo_display }}</td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td><span class="badge bg-success">{{ imovel.get_status_display }}</span></td>
+                            </tr>
+                            {% if imovel.area_total %}
+                            <tr>
+                                <th>Área Total</th>
+                                <td>{{ imovel.area_total|floatformat:0 }} m²</td>
+                            </tr>
+                            {% endif %}
+                            {% if imovel.suites %}
+                            <tr>
+                                <th>Suítes</th>
+                                <td>{{ imovel.suites }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if imovel.andar %}
+                            <tr>
+                                <th>Andar</th>
+                                <td>{{ imovel.andar }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if imovel.ano_construcao %}
+                            <tr>
+                                <th>Ano de Construção</th>
+                                <td>{{ imovel.ano_construcao }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th>Mobília</th>
+                                <td>{{ imovel.get_mobilia_display }}</td>
+                            </tr>
+                            <tr>
+                                <th>Pet Friendly</th>
+                                <td>
                                     {% if imovel.pet_friendly %}
-                                        <span class="text-success">Sim</span>
+                                        <span class="text-success fw-bold">
+                                            <i class="fas fa-check me-1"></i>Sim
+                                        </span>
                                     {% else %}
-                                        <span class="text-danger">Não</span>
+                                        <span class="text-danger">
+                                            <i class="fas fa-times me-1"></i>Não
+                                        </span>
                                     {% endif %}
-                                </li>
-                                <li>
-                                    <strong>Aceita Financiamento:</strong> 
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Aceita Financiamento</th>
+                                <td>
                                     {% if imovel.aceita_financiamento %}
-                                        <span class="text-success">Sim</span>
+                                        <span class="text-success fw-bold">
+                                            <i class="fas fa-check me-1"></i>Sim
+                                        </span>
                                     {% else %}
-                                        <span class="text-danger">Não</span>
+                                        <span class="text-danger">
+                                            <i class="fas fa-times me-1"></i>Não
+                                        </span>
                                     {% endif %}
-                                </li>
-                                {% if imovel.valor_condominio %}
-                                    <li><strong>Condomínio:</strong> R$ {{ imovel.valor_condominio|floatformat:2 }}</li>
-                                {% endif %}
-                                {% if imovel.valor_iptu %}
-                                    <li><strong>IPTU:</strong> R$ {{ imovel.valor_iptu|floatformat:2 }}</li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                    </div>
+                                </td>
+                            </tr>
+                            {% if imovel.valor_condominio %}
+                            <tr>
+                                <th>Condomínio</th>
+                                <td class="fw-bold text-primary-custom">R$ {{ imovel.valor_condominio|floatformat:2 }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if imovel.valor_iptu %}
+                            <tr>
+                                <th>IPTU</th>
+                                <td class="fw-bold text-primary-custom">R$ {{ imovel.valor_iptu|floatformat:2 }}</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
             
             <!-- Infraestrutura do Condomínio -->
             {% if imovel.infraestrutura.all %}
-            <div class="mb-4">
-                <h5 class="fw-bold mb-3">Infraestrutura do Condomínio</h5>
-                <div class="row g-2">
+            <div class="info-section">
+                <h5 class="fw-bold">
+                    <i class="fas fa-building me-2"></i>Infraestrutura do Condomínio
+                </h5>
+                <div class="row g-3">
                     {% for infra in imovel.infraestrutura.all %}
                     <div class="col-md-6">
-                        <div class="d-flex align-items-center bg-light p-2 rounded">
+                        <div class="infrastructure-item d-flex align-items-center">
                             {% if infra.icone %}
-                                <i class="{{ infra.icone }} text-primary me-2"></i>
+                                <i class="{{ infra.icone }} me-3 fs-5"></i>
                             {% else %}
-                                <i class="fas fa-check text-primary me-2"></i>
+                                <i class="fas fa-check me-3 fs-5"></i>
                             {% endif %}
-                            {{ infra.nome }}
+                            <span class="fw-bold">{{ infra.nome }}</span>
                         </div>
                     </div>
                     {% endfor %}
@@ -305,109 +653,109 @@
         
         <!-- Sidebar -->
         <div class="col-lg-4">
-            <!-- Card de Contato -->
             <div class="sticky-sidebar">
-                <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">
-                            <i class="fas fa-phone me-2"></i>Interessado?
-                        </h5>
+                <!-- Card de Contato -->
+                <div class="contact-card mb-4">
+                    <h5 class="fw-bold">
+                        <i class="fas fa-headset me-2"></i>Atendimento DS Imóveis
+                    </h5>
+                    
+                    <p class="opacity-90 mb-3">
+                        Entre em contato conosco para mais informações ou agendar uma visita.
+                    </p>
+                    
+                    <!-- Resumo de preços -->
+                    {% for preco in imovel.precos.all %}
+                    <div class="contact-price">
+                        <div class="price">
+                            {% if preco.finalidade == 'temporada' %}
+                                R$ {{ preco.valor|floatformat:0 }}/dia
+                            {% else %}
+                                R$ {{ preco.valor|floatformat:0 }}
+                            {% endif %}
+                        </div>
+                        <small class="opacity-75">{{ preco.get_finalidade_display }}</small>
                     </div>
-                    <div class="card-body">
-                        <p class="card-text mb-3">Entre em contato conosco para mais informações ou agendar uma visita.</p>
-                        
-                        <!-- Preço resumo -->
-                        {% for preco in imovel.precos.all %}
-                        <div class="text-center mb-3">
-                            <div class="h4 text-success fw-bold">
-                                {% if preco.finalidade == 'temporada' %}
-                                    R$ {{ preco.valor|floatformat:0 }}/dia
-                                {% else %}
-                                    R$ {{ preco.valor|floatformat:0 }}
-                                {% endif %}
-                            </div>
-                            <small class="text-muted">{{ preco.get_finalidade_display }}</small>
-                        </div>
-                        {% if not forloop.last %}<hr>{% endif %}
-                        {% empty %}
-                        <div class="text-center mb-3">
-                            <div class="h4 text-muted">Consulte valores</div>
-                        </div>
-                        {% endfor %}
-                        
-                        <div class="d-grid gap-2">
-                            <a href="https://wa.me/5511999999999?text={{ whatsapp_msg|urlencode }}" 
-                               class="btn btn-whatsapp btn-lg" target="_blank">
-                                <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                    {% if not forloop.last %}<hr class="my-3 opacity-25">{% endif %}
+                    {% empty %}
+                    <div class="contact-price text-center">
+                        <div class="price">Consulte valores</div>
+                        <small class="opacity-75">Entre em contato</small>
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="d-grid gap-3">
+                        <a href="https://wa.me/5511999999999?text={{ whatsapp_msg|urlencode }}" 
+                           class="btn btn-contact-primary" target="_blank">
+                            <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                        </a>
+                        <a href="tel:+5511999999999" class="btn btn-contact-secondary">
+                            <i class="fas fa-phone me-2"></i>(11) 99999-9999
+                        </a>
+                        <a href="mailto:contato@dsimoveis.com.br?subject=Interesse no imóvel: {{ imovel.titulo }}" 
+                           class="btn btn-contact-secondary">
+                            <i class="fas fa-envelope me-2"></i>E-mail
+                        </a>
+                    </div>
+                    
+                    <hr class="my-4 opacity-25">
+                    
+                    <!-- Compartilhar -->
+                    <div class="text-center">
+                        <small class="opacity-75 d-block mb-3">Compartilhar:</small>
+                        <div class="share-buttons">
+                            <a href="https://wa.me/?text=Confira este imóvel: {{ request.build_absolute_uri }}" 
+                               class="share-whatsapp" target="_blank">
+                                <i class="fab fa-whatsapp"></i>
                             </a>
-                            <a href="tel:+5511999999999" class="btn btn-outline-primary">
-                                <i class="fas fa-phone me-2"></i>(11) 99999-9999
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
+                               class="share-facebook" target="_blank">
+                                <i class="fab fa-facebook"></i>
                             </a>
-                            <a href="mailto:contato@imobiliaria.com.br?subject=Interesse no imóvel: {{ imovel.titulo }}" 
-                               class="btn btn-outline-secondary">
-                                <i class="fas fa-envelope me-2"></i>E-mail
-                            </a>
-                        </div>
-                        
-                        <hr>
-                        
-                        <!-- Compartilhar -->
-                        <div class="text-center">
-                            <small class="text-muted d-block mb-2">Compartilhar:</small>
-                            <div class="d-flex justify-content-center gap-2">
-                                <a href="https://wa.me/?text=Confira este imóvel: {{ request.build_absolute_uri }}" 
-                                   class="btn btn-sm btn-outline-success" target="_blank">
-                                    <i class="fab fa-whatsapp"></i>
-                                </a>
-                                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
-                                   class="btn btn-sm btn-outline-primary" target="_blank">
-                                    <i class="fab fa-facebook"></i>
-                                </a>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="copiarLink()">
-                                    <i class="fas fa-link"></i>
-                                </button>
-                            </div>
+                            <button class="share-link" onclick="copiarLink()">
+                                <i class="fas fa-link"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Dados do Proprietário -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h6 class="card-title">Proprietário</h6>
-                        <p class="card-text">
-                            <i class="fas fa-user me-2"></i>{{ imovel.proprietario.nome_completo }}
-                        </p>
-                        {% if imovel.proprietario.telefone %}
-                        <p class="card-text">
-                            <i class="fas fa-phone me-2"></i>{{ imovel.proprietario.telefone }}
-                        </p>
-                        {% endif %}
-                    </div>
+                <div class="owner-card mb-4">
+                    <h6 class="fw-bold text-primary-custom mb-3">
+                        <i class="fas fa-user-tie me-2"></i>Proprietário
+                    </h6>
+                    <p class="mb-2">
+                        <i class="fas fa-user me-2 text-primary-custom"></i>
+                        <strong>{{ imovel.proprietario.nome_completo }}</strong>
+                    </p>
+                    {% if imovel.proprietario.telefone %}
+                    <p class="mb-0">
+                        <i class="fas fa-phone me-2 text-primary-custom"></i>
+                        {{ imovel.proprietario.telefone }}
+                    </p>
+                    {% endif %}
                 </div>
                 
                 <!-- Localização -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h6 class="mb-0">Localização</h6>
+                <div class="location-card">
+                    <h6 class="fw-bold text-primary-custom mb-3">
+                        <i class="fas fa-map-marker-alt me-2"></i>Localização
+                    </h6>
+                    <address class="mb-3">
+                        <strong>{{ imovel.endereco }}</strong><br>
+                        {{ imovel.bairro }}<br>
+                        {{ imovel.cidade }} - {{ imovel.estado }}<br>
+                        <small class="text-secondary-custom">CEP: {{ imovel.cep }}</small>
+                    </address>
+                    
+                    {% if imovel.latitude and imovel.longitude %}
+                    <div class="d-grid">
+                        <a href="https://maps.google.com/?q={{ imovel.latitude }},{{ imovel.longitude }}" 
+                           target="_blank" class="btn btn-outline-primary smooth-transition">
+                            <i class="fas fa-map-marked-alt me-2"></i>Ver no Google Maps
+                        </a>
                     </div>
-                    <div class="card-body">
-                        <address class="mb-0">
-                            <strong>{{ imovel.endereco }}</strong><br>
-                            {{ imovel.bairro }}<br>
-                            {{ imovel.cidade }} - {{ imovel.estado }}<br>
-                            CEP: {{ imovel.cep }}
-                        </address>
-                        
-                        {% if imovel.latitude and imovel.longitude %}
-                        <div class="mt-3">
-                            <a href="https://maps.google.com/?q={{ imovel.latitude }},{{ imovel.longitude }}" 
-                               target="_blank" class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-map-marked-alt me-1"></i>Ver no Mapa
-                            </a>
-                        </div>
-                        {% endif %}
-                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -416,31 +764,35 @@
     <!-- Imóveis Similares -->
     {% if imoveis_similares %}
     <div class="mt-5">
-        <h3 class="fw-bold mb-4">Imóveis Similares</h3>
+        <div class="text-center mb-5">
+            <h3 class="fw-bold text-primary-custom">
+                <i class="fas fa-home me-2"></i>Imóveis Similares
+            </h3>
+            <p class="text-secondary-custom">Outras opções que podem interessar você</p>
+        </div>
+        
         <div class="row g-4">
             {% for imovel_similar in imoveis_similares %}
             <div class="col-md-6 col-lg-3">
-                <div class="card card-imovel h-100">
+                <div class="card similar-property-card h-100">
                     <div class="position-relative">
                         {% if imovel_similar.foto_capa %}
                             <img src="{{ imovel_similar.foto_capa.imagem.url }}" 
-                                 class="card-img-top foto-capa" 
-                                 alt="{{ imovel_similar.titulo }}"
-                                 style="height: 150px;">
+                                 class="card-img-top similar-property-image" 
+                                 alt="{{ imovel_similar.titulo }}">
                         {% else %}
-                            <div class="bg-light d-flex align-items-center justify-content-center" 
-                                 style="height: 150px;">
-                                <i class="fas fa-image fs-3 text-muted"></i>
+                            <div class="bg-light-custom d-flex align-items-center justify-content-center similar-property-image">
+                                <i class="fas fa-image fs-3 text-secondary-custom"></i>
                             </div>
                         {% endif %}
                     </div>
                     
-                    <div class="card-body">
-                        <h6 class="card-title">{{ imovel_similar.titulo|truncatechars:30 }}</h6>
+                    <div class="card-body p-3">
+                        <h6 class="card-title fw-bold">{{ imovel_similar.titulo|truncatechars:35 }}</h6>
                         
                         {% if imovel_similar.precos.all %}
                             {% with imovel_similar.precos.all|first as primeiro_preco %}
-                                <div class="text-success fw-bold mb-2">
+                                <div class="price-highlight mb-2">
                                     {% if primeiro_preco.finalidade == 'temporada' %}
                                         R$ {{ primeiro_preco.valor|floatformat:0 }}/dia
                                     {% else %}
@@ -450,13 +802,14 @@
                             {% endwith %}
                         {% endif %}
                         
-                        <p class="card-text text-muted small">
+                        <p class="card-text text-secondary-custom small mb-3">
+                            <i class="fas fa-map-marker-alt me-1"></i>
                             {{ imovel_similar.bairro }}, {{ imovel_similar.cidade }}
                         </p>
                         
                         <a href="{% url 'core:detalhe_imovel' imovel_similar.pk %}" 
-                           class="btn btn-outline-primary btn-sm w-100">
-                            Ver Detalhes
+                           class="btn btn-outline-primary btn-sm w-100 smooth-transition">
+                            <i class="fas fa-eye me-1"></i>Ver Detalhes
                         </a>
                     </div>
                 </div>
@@ -473,19 +826,46 @@
     // Copiar link para clipboard
     function copiarLink() {
         navigator.clipboard.writeText(window.location.href).then(function() {
-            // Toast simples sem dependências
+            // Toast
             const toast = document.createElement('div');
-            toast.className = 'position-fixed top-0 start-50 translate-middle-x alert alert-success mt-3';
+            toast.className = 'position-fixed top-0 start-50 translate-middle-x mt-3';
             toast.style.zIndex = '9999';
-            toast.innerHTML = '<i class="fas fa-check me-2"></i>Link copiado para a área de transferência!';
+            toast.style.backgroundColor = 'var(--dourado-metalico)';
+            toast.style.color = 'var(--preto-profundo)';
+            toast.style.padding = '12px 24px';
+            toast.style.borderRadius = '25px';
+            toast.style.fontWeight = 'bold';
+            toast.style.boxShadow = '0 8px 24px rgba(200, 168, 102, 0.4)';
+            toast.innerHTML = '<i class="fas fa-check me-2"></i>Link copiado com sucesso!';
             document.body.appendChild(toast);
             
+            // Animação de entrada
+            toast.style.transform = 'translateX(-50%) translateY(-100px)';
+            toast.style.opacity = '0';
             setTimeout(() => {
-                toast.remove();
+                toast.style.transition = 'all 0.3s ease';
+                toast.style.transform = 'translateX(-50%) translateY(0)';
+                toast.style.opacity = '1';
+            }, 10);
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateX(-50%) translateY(-100px)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
             }, 3000);
         }).catch(function() {
             alert('Erro ao copiar o link. Tente novamente.');
         });
     }
+
+    // Smooth scroll para características ao clicar
+    document.querySelectorAll('.characteristic-item').forEach(item => {
+        item.addEventListener('click', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 200);
+        });
+    });
 </script>
 {% endblock %}

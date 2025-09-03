@@ -20,6 +20,76 @@ class Proprietario(models.Model):
         return self.nome_completo
 
 
+class Cliente(models.Model):
+    class StatusCliente(models.TextChoices):
+        LEAD_FRIO = 'lead_frio', 'Lead Frio'
+        LEAD_MORNO = 'lead_morno', 'Lead Morno'
+        LEAD_QUENTE = 'lead_quente', 'Lead Quente'
+        CLIENTE_ATIVO = 'cliente_ativo', 'Cliente Ativo'
+        CLIENTE_PERDIDO = 'cliente_perdido', 'Cliente Perdido'
+        CLIENTE_FINALIZADO = 'cliente_finalizado', 'Negócio Finalizado'
+    
+    class OrigemContato(models.TextChoices):
+        SITE = 'site', 'Site'
+        WHATSAPP = 'whatsapp', 'WhatsApp'
+        TELEFONE = 'telefone', 'Telefone'
+        EMAIL = 'email', 'E-mail'
+        INDICACAO = 'indicacao', 'Indicação'
+        FACEBOOK = 'facebook', 'Facebook'
+        INSTAGRAM = 'instagram', 'Instagram'
+        PLACA = 'placa', 'Placa'
+        OUTRO = 'outro', 'Outro'
+    
+    # Dados pessoais
+    nome_completo = models.CharField(max_length=150, validators=[MinLengthValidator(3)])
+    email = models.EmailField(blank=True)
+    telefone = models.CharField(max_length=20)
+    
+    # Gestão comercial
+    status = models.CharField(max_length=20, choices=StatusCliente.choices, default=StatusCliente.LEAD_FRIO)
+    origem = models.CharField(max_length=20, choices=OrigemContato.choices, default=OrigemContato.SITE)
+    
+    # Preferências
+    finalidade_interesse = models.CharField(
+        max_length=20, 
+        choices=[
+            ('venda', 'Comprar'),
+            ('aluguel', 'Alugar'),
+            ('temporada', 'Temporada'),
+            ('venda_aluguel', 'Comprar ou Alugar')
+        ],
+        blank=True
+    )
+    orcamento_max = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Orçamento máximo do cliente")
+    observacoes = models.TextField(blank=True, help_text="Observações sobre o cliente e suas preferências")
+    
+    # Imóveis de interesse
+    imoveis_interesse = models.ManyToManyField('Imovel', blank=True, related_name='clientes_interessados')
+    
+    # Controle
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    ultimo_contato = models.DateTimeField(null=True, blank=True, help_text="Data do último contato com o cliente")
+    
+    class Meta:
+        verbose_name = 'Cliente'
+        verbose_name_plural = 'Clientes'
+        ordering = ['-atualizado_em']
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['origem']),
+            models.Index(fields=['criado_em']),
+            models.Index(fields=['ultimo_contato']),
+        ]
+    
+    def __str__(self):
+        return f"{self.nome_completo} ({self.get_status_display()})"
+    
+    @property
+    def total_imoveis_interesse(self):
+        return self.imoveis_interesse.count()
+
+
 class InfraCondominio(models.Model):
     nome = models.CharField(max_length=100, unique=True)
     icone = models.CharField(max_length=50, blank=True, help_text="Classe do ícone Font Awesome")

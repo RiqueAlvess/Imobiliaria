@@ -1,30 +1,172 @@
 {% extends 'base.html' %}
 
-{% block title %}Imobiliária - Encontre o imóvel dos seus sonhos{% endblock %}
+{% block title %}DS Imóveis - Encontre o imóvel dos seus sonhos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-with-background {
+        background: linear-gradient(rgba(30, 58, 95, 0.85), rgba(13, 13, 13, 0.75)), 
+                    url('https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        color: var(--branco-puro);
+    }
+    
+    .hero-with-background::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(30, 58, 95, 0.9) 0%, rgba(200, 168, 102, 0.1) 100%);
+        z-index: 1;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .hero-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(200, 168, 102, 0.3);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .hero-card .card-header {
+        background: linear-gradient(135deg, var(--dourado-metalico), var(--dourado-claro));
+        color: var(--preto-profundo);
+    }
+    
+    .hero-card .card-body {
+        color: var(--preto-profundo);
+    }
+    
+    @media (max-width: 768px) {
+        .hero-with-background {
+            min-height: 80vh;
+        }
+        
+        .hero-card {
+            margin-top: 2rem;
+        }
+    }
+    
+    /* Animação suave para elementos do hero */
+    .hero-fade-in {
+        animation: fadeInUp 1s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .hero-title {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .hero-subtitle {
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Efeito de partículas flutuantes */
+    .floating-particles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .particle {
+        position: absolute;
+        background: rgba(200, 168, 102, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .particle:nth-child(1) { width: 10px; height: 10px; left: 10%; animation-delay: 0s; }
+    .particle:nth-child(2) { width: 15px; height: 15px; left: 20%; animation-delay: 1s; }
+    .particle:nth-child(3) { width: 8px; height: 8px; left: 30%; animation-delay: 2s; }
+    .particle:nth-child(4) { width: 12px; height: 12px; left: 80%; animation-delay: 3s; }
+    .particle:nth-child(5) { width: 6px; height: 6px; left: 90%; animation-delay: 4s; }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+        10%, 90% { opacity: 1; }
+        50% { transform: translateY(-10px) rotate(180deg); }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="bg-primary text-white py-5">
-    <div class="container">
-        <div class="row align-items-center">
+<!-- Hero Section with Background -->
+<section class="hero-with-background">
+    <!-- Partículas flutuantes -->
+    <div class="floating-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    
+    <div class="container hero-content">
+        <div class="row align-items-center min-vh-75">
             <div class="col-lg-6">
-                <h1 class="display-5 fw-bold mb-3">Encontre o imóvel dos seus sonhos</h1>
-                <p class="lead mb-4">Casas, apartamentos e salas comerciais para venda, aluguel e temporada.</p>
+                <div class="hero-fade-in">
+                    <h1 class="display-3 fw-bold mb-4 hero-title">
+                        Encontre o imóvel 
+                        <span class="text-primary-custom">dos seus sonhos</span>
+                    </h1>
+                    <p class="lead mb-4 hero-subtitle" style="font-size: 1.25rem;">
+                        Casas, apartamentos e salas comerciais de qualidade para venda, aluguel e temporada. 
+                        Confiança e transparência em cada negócio.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="{% url 'core:lista_imoveis' %}" class="btn btn-primary btn-lg smooth-transition shadow-lg">
+                            <i class="fas fa-search me-2"></i>Explorar Imóveis
+                        </a>
+                        <a href="https://wa.me/5511999999999?text=Olá! Gostaria de atendimento especializado." 
+                           class="btn btn-outline-light btn-lg smooth-transition shadow-lg" target="_blank">
+                            <i class="fab fa-whatsapp me-2"></i>Atendimento Especializado
+                        </a>
+                    </div>
+                </div>
             </div>
             <div class="col-lg-6">
-                <!-- Busca Principal -->
-                <div class="card">
-                    <div class="card-body">
+                <!-- Busca Principal com Design Aprimorado -->
+                <div class="card hero-card border-0 shadow-lg hero-fade-in" style="animation-delay: 0.3s;">
+                    <div class="card-header border-0">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-search me-2"></i>Busca Avançada
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
                         <form method="get" action="{% url 'core:lista_imoveis' %}">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Onde você quer morar?</label>
-                                <input type="text" class="form-control form-control-lg" name="busca"
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-primary-custom mb-2">
+                                    <i class="fas fa-map-marker-alt me-1"></i>Onde você quer morar?
+                                </label>
+                                <input type="text" class="form-control form-control-lg border-primary-custom shadow-sm" name="busca"
                                     placeholder="Digite o bairro, cidade ou endereço" autocomplete="off">
                             </div>
 
-                            <div class="row g-2 mb-3">
+                            <div class="row g-3 mb-4">
                                 <div class="col-sm-6">
-                                    <select class="form-select" name="tipo">
+                                    <label class="form-label fw-bold text-primary-custom small">Tipo</label>
+                                    <select class="form-select border-primary-custom shadow-sm" name="tipo">
                                         <option value="">Tipo do imóvel</option>
                                         {% for tipo_codigo, tipo_nome in tipos %}
                                         <option value="{{ tipo_codigo }}">{{ tipo_nome }}</option>
@@ -32,7 +174,8 @@
                                     </select>
                                 </div>
                                 <div class="col-sm-6">
-                                    <select class="form-select" name="cidade">
+                                    <label class="form-label fw-bold text-primary-custom small">Cidade</label>
+                                    <select class="form-select border-primary-custom shadow-sm" name="cidade">
                                         <option value="">Cidade</option>
                                         {% for cidade in cidades %}
                                         <option value="{{ cidade }}">{{ cidade }}</option>
@@ -41,7 +184,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-success btn-lg w-100">
+                            <button type="submit" class="btn btn-primary btn-lg w-100 smooth-transition shadow-lg">
                                 <i class="fas fa-search me-2"></i>Buscar Imóveis
                             </button>
                         </form>
@@ -53,49 +196,68 @@
 </section>
 
 <!-- Filtros Rápidos -->
-<section class="py-4 bg-light">
+<section class="py-5 bg-light-custom">
     <div class="container">
-        <div class="row g-3">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-primary-custom">
+                <i class="fas fa-home me-2"></i>Categorias Principais
+            </h2>
+            <p class="text-secondary-custom">Encontre exatamente o que procura</p>
+        </div>
+        
+        <div class="row g-4">
             <div class="col-lg-3 col-6">
                 <a href="{% url 'core:lista_imoveis' %}?finalidade=venda" class="text-decoration-none">
-                    <div class="card text-center h-100 border-0 shadow-sm card-imovel">
-                        <div class="card-body">
-                            <i class="fas fa-tag text-success fs-1 mb-3"></i>
-                            <h5 class="card-title">Comprar</h5>
-                            <p class="card-text text-muted">Imóveis à venda</p>
+                    <div class="card text-center h-100 border-0 shadow-lg card-imovel">
+                        <div class="card-body py-4">
+                            <div class="mb-3" style="color: var(--dourado-metalico);">
+                                <i class="fas fa-tag fs-1"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Comprar</h5>
+                            <p class="card-text text-secondary-custom">Imóveis à venda</p>
+                            <span class="badge badge-custom">Qualidade</span>
                         </div>
                     </div>
                 </a>
             </div>
             <div class="col-lg-3 col-6">
                 <a href="{% url 'core:lista_imoveis' %}?finalidade=aluguel" class="text-decoration-none">
-                    <div class="card text-center h-100 border-0 shadow-sm card-imovel">
-                        <div class="card-body">
-                            <i class="fas fa-key text-primary fs-1 mb-3"></i>
-                            <h5 class="card-title">Alugar</h5>
-                            <p class="card-text text-muted">Imóveis para aluguel</p>
+                    <div class="card text-center h-100 border-0 shadow-lg card-imovel">
+                        <div class="card-body py-4">
+                            <div class="mb-3" style="color: var(--azul-petroleo);">
+                                <i class="fas fa-key fs-1"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Alugar</h5>
+                            <p class="card-text text-secondary-custom">Imóveis para aluguel</p>
+                            <span class="badge" style="background-color: var(--azul-petroleo); color: white;">Confiança</span>
                         </div>
                     </div>
                 </a>
             </div>
             <div class="col-lg-3 col-6">
                 <a href="{% url 'core:lista_imoveis' %}?finalidade=temporada" class="text-decoration-none">
-                    <div class="card text-center h-100 border-0 shadow-sm card-imovel">
-                        <div class="card-body">
-                            <i class="fas fa-calendar-alt text-warning fs-1 mb-3"></i>
-                            <h5 class="card-title">Temporada</h5>
-                            <p class="card-text text-muted">Aluguel por temporada</p>
+                    <div class="card text-center h-100 border-0 shadow-lg card-imovel">
+                        <div class="card-body py-4">
+                            <div class="mb-3" style="color: var(--dourado-claro);">
+                                <i class="fas fa-calendar-alt fs-1"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Temporada</h5>
+                            <p class="card-text text-secondary-custom">Aluguel por temporada</p>
+                            <span class="badge" style="background-color: var(--dourado-claro); color: var(--preto-profundo);">Flexível</span>
                         </div>
                     </div>
                 </a>
             </div>
             <div class="col-lg-3 col-6">
                 <a href="{% url 'core:lista_imoveis' %}" class="text-decoration-none">
-                    <div class="card text-center h-100 border-0 shadow-sm card-imovel">
-                        <div class="card-body">
-                            <i class="fas fa-map text-info fs-1 mb-3"></i>
-                            <h5 class="card-title">Ver Todos</h5>
-                            <p class="card-text text-muted">Explorar imóveis</p>
+                    <div class="card text-center h-100 border-0 shadow-lg card-imovel">
+                        <div class="card-body py-4">
+                            <div class="mb-3" style="color: var(--preto-profundo);">
+                                <i class="fas fa-home fs-1"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Ver Todos</h5>
+                            <p class="card-text text-secondary-custom">Explorar catálogo</p>
+                            <span class="badge" style="background-color: var(--preto-profundo); color: var(--dourado-claro);">Completo</span>
                         </div>
                     </div>
                 </a>
@@ -108,113 +270,127 @@
 <section class="py-5">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold">Imóveis em Destaque</h2>
-            <p class="text-muted">Confira os lançamentos mais recentes</p>
+            <h2 class="fw-bold">
+                <i class="fas fa-star me-2 text-primary-custom"></i>Imóveis em Destaque
+            </h2>
+            <p class="text-secondary-custom">Confira nossa seleção de propriedades de qualidade</p>
         </div>
 
         {% if imoveis_destaque %}
         <div class="row g-4">
             {% for imovel in imoveis_destaque %}
             <div class="col-lg-4 col-md-6">
-                <div class="card card-imovel h-100">
-                    <div class="position-relative">
+                <div class="card card-imovel h-100 border-0 shadow-lg">
+                    <div class="position-relative overflow-hidden">
                         {% if imovel.foto_capa %}
                         <img src="{{ imovel.foto_capa.imagem.url }}" class="card-img-top foto-capa"
                             alt="{{ imovel.titulo }}">
                         {% else %}
-                        <div class="foto-capa bg-light d-flex align-items-center justify-content-center">
-                            <i class="fas fa-image fs-1 text-muted"></i>
+                        <div class="foto-capa bg-light-custom d-flex align-items-center justify-content-center">
+                            <i class="fas fa-image fs-1 text-secondary-custom"></i>
                         </div>
                         {% endif %}
 
                         <!-- Badges de finalidade -->
                         {% for preco in imovel.precos.all %}
-                        {% if preco.finalidade == 'venda' %}
-                        <span class="badge bg-success badge-finalidade">Venda</span>
-                        {% elif preco.finalidade == 'aluguel' %}
-                        <span class="badge bg-primary badge-finalidade">Aluguel</span>
-                        {% elif preco.finalidade == 'temporada' %}
-                        <span class="badge bg-warning badge-finalidade">Temporada</span>
+                        {% if forloop.first %}
+                            {% if preco.finalidade == 'venda' %}
+                            <span class="badge-finalidade">
+                                <i class="fas fa-tag me-1"></i>Venda
+                            </span>
+                            {% elif preco.finalidade == 'aluguel' %}
+                            <span class="badge-finalidade">
+                                <i class="fas fa-key me-1"></i>Aluguel
+                            </span>
+                            {% elif preco.finalidade == 'temporada' %}
+                            <span class="badge-finalidade">
+                                <i class="fas fa-calendar-alt me-1"></i>Temporada
+                            </span>
+                            {% endif %}
                         {% endif %}
                         {% endfor %}
 
                         {% if imovel.recem_publicado %}
-                        <span class="badge bg-danger" style="position: absolute; top: 10px; right: 10px;">
-                            Novo
+                        <span class="badge" style="position: absolute; top: 15px; right: 15px; background-color: #dc3545; color: white; font-weight: bold; padding: 6px 12px; border-radius: 20px;">
+                            <i class="fas fa-star me-1"></i>Novo
                         </span>
                         {% endif %}
                     </div>
 
-                    <div class="card-body">
-                        <h5 class="card-title">{{ imovel.titulo|truncatechars:50 }}</h5>
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-bold mb-3">{{ imovel.titulo|truncatechars:50 }}</h5>
 
                         <!-- Preços -->
-                        <div class="mb-2">
+                        <div class="mb-3">
                             {% for preco in imovel.precos.all %}
                             <div class="preco-destaque">
                                 {% if preco.finalidade == 'temporada' %}
-                                R$ {{ preco.valor|floatformat:0 }}/diária
+                                R$ {{ preco.valor|floatformat:0 }}<small>/diária</small>
                                 {% else %}
                                 R$ {{ preco.valor|floatformat:0 }}
                                 {% endif %}
-                                <small class="text-muted">({{ preco.get_finalidade_display }})</small>
+                                <br><small class="text-secondary-custom">({{ preco.get_finalidade_display }})</small>
                             </div>
                             {% empty %}
-                            <div class="text-muted">Consulte valores</div>
+                            <div class="text-secondary-custom">Consulte valores</div>
                             {% endfor %}
                         </div>
 
                         <!-- Características -->
                         <div class="d-flex flex-wrap gap-2 mb-3">
-    {% if imovel.area_util %}
-    <small class="badge bg-light text-dark">
-        <i class="fas fa-expand-arrows-alt me-1"></i>{{ imovel.area_util|floatformat:0 }}m²
-    </small>
-    {% endif %}
-    
-    {% if imovel.quartos %}
-    <small class="badge bg-light text-dark">
-        <i class="fas fa-bed me-1"></i>{{ imovel.quartos }} quarto{{ imovel.quartos|pluralize }}
-    </small>
-    {% endif %}
-    
-    {% if imovel.banheiros %}
-    <small class="badge bg-light text-dark">
-        <i class="fas fa-bath me-1"></i>{{ imovel.banheiros }} banheiro{{ imovel.banheiros|pluralize }}
-    </small>
-    {% endif %}
-    
-    {% if imovel.vagas_garagem %}
-    <small class="badge bg-light text-dark">
-        <i class="fas fa-car me-1"></i>{{ imovel.vagas_garagem }} vaga{{ imovel.vagas_garagem|pluralize }}
-    </small>
-    {% endif %}
-</div>
+                            {% if imovel.area_util %}
+                            <small class="badge badge-light">
+                                <i class="fas fa-expand-arrows-alt me-1"></i>{{ imovel.area_util|floatformat:0 }}m²
+                            </small>
+                            {% endif %}
+                            
+                            {% if imovel.quartos %}
+                            <small class="badge badge-light">
+                                <i class="fas fa-bed me-1"></i>{{ imovel.quartos }} quarto{{ imovel.quartos|pluralize }}
+                            </small>
+                            {% endif %}
+                            
+                            {% if imovel.banheiros %}
+                            <small class="badge badge-light">
+                                <i class="fas fa-bath me-1"></i>{{ imovel.banheiros }} banheiro{{ imovel.banheiros|pluralize }}
+                            </small>
+                            {% endif %}
+                            
+                            {% if imovel.vagas_garagem %}
+                            <small class="badge badge-light">
+                                <i class="fas fa-car me-1"></i>{{ imovel.vagas_garagem }} vaga{{ imovel.vagas_garagem|pluralize }}
+                            </small>
+                            {% endif %}
+                        </div>
 
                         <!-- Localização -->
-                        <p class="card-text text-muted mb-3">
-                            <i class="fas fa-map-marker-alt me-1"></i>
+                        <p class="card-text text-secondary-custom mb-3">
+                            <i class="fas fa-map-marker-alt me-2 text-primary-custom"></i>
                             {{ imovel.bairro }}, {{ imovel.cidade }}
                         </p>
 
                         <!-- Badges extras -->
-                        <div class="d-flex flex-wrap gap-1 mb-3">
+                        <div class="d-flex flex-wrap gap-2 mb-4">
                             {% if imovel.pet_friendly %}
-                            <small class="badge bg-info">Pet Friendly</small>
+                            <small class="badge" style="background-color: var(--azul-petroleo); color: white;">
+                                <i class="fas fa-paw me-1"></i>Pet Friendly
+                            </small>
                             {% endif %}
                             {% if imovel.mobilia != 'vazio' %}
-                            <small class="badge bg-secondary">{{ imovel.get_mobilia_display }}</small>
+                            <small class="badge badge-custom">
+                                <i class="fas fa-couch me-1"></i>{{ imovel.get_mobilia_display }}
+                            </small>
                             {% endif %}
                         </div>
 
                         <!-- Botões -->
                         <div class="d-grid gap-2">
-                            <a href="{% url 'core:detalhe_imovel' imovel.pk %}" class="btn btn-outline-primary">
-                                <i class="fas fa-eye me-1"></i>Ver Detalhes
+                            <a href="{% url 'core:detalhe_imovel' imovel.pk %}" class="btn btn-outline-primary smooth-transition">
+                                <i class="fas fa-eye me-2"></i>Ver Detalhes
                             </a>
                             <a href="https://wa.me/5511999999999?text=Olá! Tenho interesse no imóvel: {{ imovel.titulo|urlencode }} - {{ imovel.endereco|urlencode }}"
-                                class="btn btn-whatsapp" target="_blank">
-                                <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                                class="btn btn-whatsapp smooth-transition" target="_blank">
+                                <i class="fab fa-whatsapp me-2"></i>Contato Imediato
                             </a>
                         </div>
                     </div>
@@ -224,29 +400,83 @@
         </div>
 
         <div class="text-center mt-5">
-            <a href="{% url 'core:lista_imoveis' %}" class="btn btn-primary btn-lg">
-                <i class="fas fa-search me-2"></i>Ver Todos os Imóveis
+            <a href="{% url 'core:lista_imoveis' %}" class="btn btn-primary btn-lg smooth-transition">
+                <i class="fas fa-home me-2"></i>Ver Todo Catálogo
             </a>
         </div>
         {% else %}
         <div class="text-center py-5">
-            <i class="fas fa-home fs-1 text-muted mb-3"></i>
-            <h4 class="text-muted">Nenhum imóvel cadastrado ainda</h4>
-            <p class="text-muted">Em breve teremos novidades para você!</p>
+            <div class="mb-4" style="color: var(--cinza-medio);">
+                <i class="fas fa-home fs-1"></i>
+            </div>
+            <h4 class="text-secondary-custom">Em breve: Novos Imóveis</h4>
+            <p class="text-secondary-custom">Estamos preparando uma seleção especial para você!</p>
+            <a href="https://wa.me/5511999999999?text=Quero ser avisado sobre os novos lançamentos!" 
+               class="btn btn-primary smooth-transition" target="_blank">
+                <i class="fab fa-whatsapp me-2"></i>Receber Novidades
+            </a>
         </div>
         {% endif %}
     </div>
 </section>
 
 <!-- CTA Section -->
-<section class="bg-primary text-white py-5">
+<section class="hero-section py-5">
     <div class="container text-center">
-        <h2 class="fw-bold mb-3">Não encontrou o que procura?</h2>
-        <p class="lead mb-4">Entre em contato conosco e encontraremos o imóvel ideal para você!</p>
-        <a href="https://wa.me/5511999999999?text=Olá! Gostaria de ajuda para encontrar um imóvel."
-            class="btn btn-success btn-lg" target="_blank">
-            <i class="fab fa-whatsapp me-2"></i>Falar no WhatsApp
-        </a>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h2 class="fw-bold mb-3">
+                    <i class="fas fa-headset me-2"></i>Atendimento Personalizado
+                </h2>
+                <p class="lead mb-4 opacity-90">
+                    Não encontrou o que procura? Nossa equipe especializada está pronta para encontrar 
+                    o imóvel perfeito que atenda às suas necessidades e supere suas expectativas.
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="https://wa.me/5511999999999?text=Olá! Gostaria de atendimento personalizado para encontrar um imóvel."
+                        class="btn btn-primary btn-lg smooth-transition" target="_blank">
+                        <i class="fab fa-whatsapp me-2"></i>Atendimento Especializado
+                    </a>
+                    <a href="tel:+5511999999999" class="btn btn-outline-light btn-lg smooth-transition">
+                        <i class="fas fa-phone me-2"></i>(11) 99999-9999
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Seção de Diferenciais -->
+<section class="py-5 bg-light-custom">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-primary-custom">Por que escolher a DS Imóveis?</h2>
+            <p class="text-secondary-custom">Qualidade em cada detalhe</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="mb-3" style="color: var(--dourado-metalico);">
+                    <i class="fas fa-award fs-1"></i>
+                </div>
+                <h5 class="fw-bold">Qualidade Garantida</h5>
+                <p class="text-secondary-custom">Todos os imóveis passam por rigorosa seleção</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="mb-3" style="color: var(--azul-petroleo);">
+                    <i class="fas fa-users fs-1"></i>
+                </div>
+                <h5 class="fw-bold">Atendimento Especializado</h5>
+                <p class="text-secondary-custom">Equipe dedicada ao seu sucesso</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="mb-3" style="color: var(--dourado-claro);">
+                    <i class="fas fa-shield-alt fs-1"></i>
+                </div>
+                <h5 class="fw-bold">Segurança Total</h5>
+                <p class="text-secondary-custom">Transparência em todo o processo</p>
+            </div>
+        </div>
     </div>
 </section>
 {% endblock %}
